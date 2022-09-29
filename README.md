@@ -1,2 +1,2 @@
 # elastic-search
-A complete elastic search engine builder framework
+The complete elastic search engine builder framework
