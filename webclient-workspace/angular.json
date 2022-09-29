@@ -1,0 +1,112 @@
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "cli": {
+    "analytics": "7cb73a59-a298-4138-bdcf-8af24f72cadc"
+  },
+  "version": 1,
+  "newProjectRoot": "projects",
+  "projects": {
+    "elk-web-client": {
+      "projectType": "application",
+      "schematics": {
+        "@schematics/angular:application": {
+          "strict": true
+        }
+      },
+      "root": "projects/elk-web-client",
+      "sourceRoot": "projects/elk-web-client/src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "dist/elk-web-client",
+            "index": "projects/elk-web-client/src/index.html",
+            "main": "projects/elk-web-client/src/main.ts",
+            "polyfills": "projects/elk-web-client/src/polyfills.ts",
+            "tsConfig": "projects/elk-web-client/tsconfig.app.json",
+            "assets": [
+              "projects/elk-web-client/src/favicon.ico",
+              "projects/elk-web-client/src/assets"
+            ],
+            "styles": [
+              "./node_modules/@angular/material/prebuilt-themes/deeppurple-amber.css",
+              "projects/elk-web-client/src/styles.css",
+              "./node_modules/bootstrap/dist/css/bootstrap.min.css"
+            ],
+            "scripts": []
+          },
+          "configurations": {
+            "production": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "4mb",
+                  "maximumError": "5mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "2kb",
+                  "maximumError": "4kb"
+                }
+              ],
+              "fileReplacements": [
+                {
+                  "replace": "projects/elk-web-client/src/environments/environment.ts",
+                  "with": "projects/elk-web-client/src/environments/environment.prod.ts"
+                }
+              ],
+              "outputHashing": "all"
+            },
+            "development": {
+              "buildOptimizer": false,
+              "optimization": false,
+              "vendorChunk": true,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "namedChunks": true
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "configurations": {
+            "production": {
+              "browserTarget": "elk-web-client:build:production"
+            },
+            "development": {
+              "browserTarget": "elk-web-client:build:development"
+            }
+          },
+          "defaultConfiguration": "development"
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": {
+            "browserTarget": "elk-web-client:build"
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/elk-web-client/src/test.ts",
+            "polyfills": "projects/elk-web-client/src/polyfills.ts",
+            "tsConfig": "projects/elk-web-client/tsconfig.spec.json",
+            "karmaConfig": "projects/elk-web-client/karma.conf.js",
+            "assets": [
+              "projects/elk-web-client/src/favicon.ico",
+              "projects/elk-web-client/src/assets"
+            ],
+            "styles": [
+              "./node_modules/@angular/material/prebuilt-themes/deeppurple-amber.css",
+              "projects/elk-web-client/src/styles.css"
+            ],
+            "scripts": []
+          }
+        }
+      }
+    }
+  },
+  "defaultProject": "elk-web-client"
+}

@@ -1,0 +1,5 @@
+{
+  "mongo_conn_str": "mongodb+srv://kebs:kebs123@dev.pkaby.mongodb.net",
+  "rabbit_mq_str": "amqps://devmtadmin:YkOlicg^uH$z@b-a9b07ac9-a914-4104-a496-7f8110212539.mq.us-east-1.amazonaws.com:5671"
+
+}

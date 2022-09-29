@@ -1,0 +1,5 @@
+
+
+# Second stage nginx copy
+FROM nginx:alpine
+COPY dist/elk-web-client /usr/share/nginx/html

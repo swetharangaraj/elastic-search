@@ -1,0 +1,6 @@
+{
+  "mongo_conn_str": "mongodb+srv://kebsmt:kebsmt@kebs-mt.mjvpu.mongodb.net",
+  "rabbit_mq_str": "amqps://mtadmin:!vLuP5wL^FXt@b-1ce815ed-7612-4e28-955c-b9e29263752f.mq.us-east-1.amazonaws.com:5671",
+  "elastic_url": "https://kebs-prd.es.us-east-1.aws.found.io:9243",
+  "elasticApiKey": "MkYzLWlJTUIzNzFYNC1ieHFSbzY6cnI5SmlZaU5SSGFmQXY5QUJuUWx2QQ=="
+}

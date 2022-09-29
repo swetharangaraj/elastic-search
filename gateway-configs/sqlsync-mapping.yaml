@@ -1,0 +1,9 @@
+apiVersion: ambassador/v1
+kind: Mapping
+name: sqlSync_mapping
+prefix: /api/sqlSync
+rewrite: /api/sqlSync
+service: search-mgmt-service:6600
+timeout_ms: 60000
+idle_timeout_ms: 120000
+connect_timeout_ms: 60000

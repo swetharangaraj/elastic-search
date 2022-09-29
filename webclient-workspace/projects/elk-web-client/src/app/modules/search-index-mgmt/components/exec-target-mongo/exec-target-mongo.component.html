@@ -1,0 +1,404 @@
+<div class="row">
+  <div class="col-12">
+    <h4>Select the Target Databases to which you want to sync Data</h4>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-12">
+    <mat-button-toggle-group
+      name="fontStyle"
+      aria-label="Font Style"
+      [value]="selectedTargetDatabaseType"
+    >
+      <mat-button-toggle
+        [ngStyle]="{
+          background: selectedTargetDatabaseType == 'tad' ? 'bisque' : ''
+        }"
+        value="tad"
+        (click)="selectTargetDbType('tad')"
+        >Tenant Databases</mat-button-toggle
+      >
+      <mat-button-toggle
+        [ngStyle]="{
+          background: selectedTargetDatabaseType == 'other' ? 'bisque' : ''
+        }"
+        value="Other"
+        (click)="selectTargetDbType('other')"
+        >Other Databases</mat-button-toggle
+      >
+    </mat-button-toggle-group>
+  </div>
+</div>
+
+<div *ngIf="selectedTargetDatabaseType == 'tad'">
+  <div class="row">
+    <div class="col-5">
+      <div class="row mt-3">
+        <div class="col-12">Select the Column To be indexed</div>
+      </div>
+      <div class="row mt-2">
+        <div class="col-12">
+          <mat-form-field class="example-full-width" appearance="fill">
+            <mat-label>collection name</mat-label>
+            <input
+              type="text"
+              placeholder="Pick one"
+              aria-label="Table Name"
+              matInput
+              [formControl]="collectionNameControl"
+              [matAutocomplete]="auto"
+            />
+            <mat-autocomplete
+              autoActiveFirstOption
+              #auto="matAutocomplete"
+              (optionSelected)="changeInBaseCollection($event)"
+            >
+              <mat-option
+                *ngFor="let option of collectionNameFilteredOptions | async"
+                [value]="option"
+              >
+                {{ option }}
+              </mat-option>
+            </mat-autocomplete>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div class="row mt-2">
+        <div class="col-12">define the field names to be indexed</div>
+      </div>
+
+      <div class="row mt-2">
+        <div class="col-12">
+          <mat-form-field class="example-chip-list" appearance="fill">
+            <mat-label>columns</mat-label>
+            <mat-chip-list #chipList aria-label="field selection">
+              <mat-chip
+                *ngFor="let field of fieldsToBeIndexed"
+                (removed)="remove(field)"
+              >
+                {{ field }}
+                <button matChipRemove>
+                  <mat-icon>cancel</mat-icon>
+                </button>
+              </mat-chip>
+              <input
+                placeholder="New field..."
+                [matChipInputFor]="chipList"
+                [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                [matChipInputAddOnBlur]="addOnBlur"
+                (matChipInputTokenEnd)="add($event)"
+              />
+            </mat-chip-list>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div class="row mt-2">
+        <div class="col-12">
+          Determine the role groups to which the index is accessible
+        </div>
+      </div>
+
+      <div class="row mt-2">
+        <div class="col-12">
+          <mat-form-field class="example-chip-list" appearance="fill">
+            <mat-label>Role groups</mat-label>
+            <mat-chip-list #chipListRoleGroup>
+              <mat-chip
+                *ngFor="let role of selectedRoleGroups; let i = index"
+                (removed)="removeRole(i)"
+              >
+                {{ role.role_name }}|{{ role.role_id }}
+                <button matChipRemove>
+                  <mat-icon>cancel</mat-icon>
+                </button>
+              </mat-chip>
+              <input
+                placeholder="New Role Group..."
+                #roleGrpInput
+                [formControl]="roleGroupCtrl"
+                [matAutocomplete]="autoRole"
+                [matChipInputFor]="chipListRoleGroup"
+                [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+              />
+            </mat-chip-list>
+            <mat-autocomplete
+              #autoRole="matAutocomplete"
+              (optionSelected)="selected($event)"
+            >
+              <mat-option
+                *ngFor="let role of filteredRoleGroups | async"
+                [value]="role"
+              >
+                {{ role.role_name }}
+              </mat-option>
+            </mat-autocomplete>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div class="row mt-2">
+        <div class="col-12">Index alias name</div>
+      </div>
+
+      <div class="row mt-2">
+        <div class="col-12">
+          <mat-form-field appearance="fill">
+            <mat-label>Index alias</mat-label>
+            <input matInput [formControl]="indexAlias" />
+          </mat-form-field>
+        </div>
+      </div>
+      <div class="row mt-2">
+        <div class="col-12">Index Route Url</div>
+      </div>
+
+      <div class="row mt-2">
+        <div class="col-12">
+          <mat-form-field appearance="fill">
+            <mat-label>index route url</mat-label>
+            <input matInput [formControl]="routeUrl" />
+          </mat-form-field>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-12">
+          <button mat-raised-button class="ml-3" (click)="startIndexing()">
+            Start Indexing
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="col-5">
+      <div class="row">
+        <div class="col-12">
+          <table
+            id="col-existence"
+            *ngIf="collectionExistenceResult.length > 0"
+          >
+            <tr>
+              <th>database</th>
+              <th>collection</th>
+              <th>exists</th>
+              <th>select to index</th>
+            </tr>
+            <tr *ngFor="let item of collectionExistenceResult">
+              <td>{{ item.db }}</td>
+              <td>{{ item.col }}</td>
+              <td>{{ item.does_col_exist ? "✅" : "❌" }}</td>
+              <td>
+                <input
+                  type="checkbox"
+                  (change)="formIndexToBeCreated()"
+                  [(ngModel)]="item.isSelected"
+                  [disabled]="!item.does_col_exist"
+                />
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+      <div class="row mt-2" *ngIf="indexToBeCreated.length > 0">
+        <div class="col-12">
+          The following indexes will be created only for the databases that have
+          selected collection
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-12">
+          <table id="col-existence" *ngIf="indexToBeCreated.length > 0">
+            <tr>
+              <th>Index</th>
+              <th>indexing status</th>
+              <th>pipeline status</th>
+            </tr>
+            <tr *ngFor="let item of indexToBeCreated">
+              <td>{{ item.index_name }}</td>
+              <td>{{ item.isIndexed ? "✅" : "❌" }}</td>
+              <td>{{ item.isPipelined ? "✅" : "❌" }}</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div *ngIf="selectedTargetDatabaseType == 'other'">
+  <div class="row">
+    <div class="col-5">
+      <div class="row mt-3">
+        <div class="col-12">Select the Other database</div>
+      </div>
+      <div class="row mt-2">
+        <div class="col-12">
+          <mat-form-field class="example-full-width" appearance="fill">
+            <mat-label>database</mat-label>
+            <input
+              type="text"
+              placeholder="Pick one"
+              aria-label="database  Name"
+              matInput
+              [formControl]="otherDbNameFormCtrl"
+              [matAutocomplete]="auto1"
+            />
+            <mat-autocomplete
+              autoActiveFirstOption
+              #auto1="matAutocomplete"
+              (optionSelected)="changeInOtherDatabase($event)"
+            >
+              <mat-option
+                *ngFor="let option of otherDbFilteredOptions | async"
+                [value]="option"
+              >
+                {{ option }}
+              </mat-option>
+            </mat-autocomplete>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div class="row mt-3">
+        <div class="col-12">Select the collection</div>
+      </div>
+      <div class="row mt-2">
+        <div class="col-12">
+          <mat-form-field class="example-full-width" appearance="fill">
+            <mat-label>Collection</mat-label>
+            <input
+              type="text"
+              placeholder="Pick one"
+              aria-label="Collection  Name"
+              matInput
+              [formControl]="otherDbCollectionNameFormCtrl"
+              [matAutocomplete]="auto2"
+            />
+            <mat-autocomplete
+              autoActiveFirstOption
+              #auto2="matAutocomplete"
+              (optionSelected)="changeInOtherDatabaseCollection($event)"
+            >
+              <mat-option
+                *ngFor="let option of otherDbCollectionFilteredOptions | async"
+                [value]="option"
+              >
+                {{ option }}
+              </mat-option>
+            </mat-autocomplete>
+          </mat-form-field>
+        </div>
+      </div>
+      <div class="row mt-2">
+        <div class="col-12">Index Route Url</div>
+      </div>
+
+      <div class="row mt-2">
+        <div class="col-12">
+          <mat-form-field appearance="fill">
+            <mat-label>index route url</mat-label>
+            <input matInput [formControl]="routeUrl" />
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div class="row mt-2">
+        <div class="col-12">define the field names to be indexed</div>
+      </div>
+
+      <div class="row mt-2">
+        <div class="col-12">
+          <mat-form-field class="example-chip-list" appearance="fill">
+            <mat-label>columns</mat-label>
+            <mat-chip-list #chipList aria-label="field selection">
+              <mat-chip
+                *ngFor="let field of fieldsToBeIndexed"
+                (removed)="remove(field)"
+              >
+                {{ field }}
+                <button matChipRemove>
+                  <mat-icon>cancel</mat-icon>
+                </button>
+              </mat-chip>
+              <input
+                placeholder="New field..."
+                [matChipInputFor]="chipList"
+                [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                [matChipInputAddOnBlur]="addOnBlur"
+                (matChipInputTokenEnd)="add($event)"
+              />
+            </mat-chip-list>
+          </mat-form-field>
+        </div>
+      </div>
+      <div class="row mt-2">
+        <div class="col-12">
+          Determine the role groups to which the index is accessible
+        </div>
+      </div>
+
+      <div class="row mt-2">
+        <div class="col-12">
+          <mat-form-field class="example-chip-list" appearance="fill">
+            <mat-label>Role groups</mat-label>
+            <mat-chip-list #chipListRoleGroup>
+              <mat-chip
+                *ngFor="let role of selectedRoleGroups; let i = index"
+                (removed)="removeRole(i)"
+              >
+                {{ role.role_name }}|{{ role.role_id }}
+                <button matChipRemove>
+                  <mat-icon>cancel</mat-icon>
+                </button>
+              </mat-chip>
+              <input
+                placeholder="New Role Group..."
+                #roleGrpInput
+                [formControl]="roleGroupCtrl"
+                [matAutocomplete]="autoRole"
+                [matChipInputFor]="chipListRoleGroup"
+                [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+              />
+            </mat-chip-list>
+            <mat-autocomplete
+              #autoRole="matAutocomplete"
+              (optionSelected)="selected($event)"
+            >
+              <mat-option
+                *ngFor="let role of filteredRoleGroups | async"
+                [value]="role"
+              >
+                {{ role.role_name }}
+              </mat-option>
+            </mat-autocomplete>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div class="row mt-2">
+        <div class="col-12">Index alias name</div>
+      </div>
+
+      <div class="row mt-2">
+        <div class="col-12">
+          <mat-form-field appearance="fill">
+            <mat-label>Index alias</mat-label>
+            <input matInput [formControl]="indexAlias" />
+          </mat-form-field>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-12">
+          <button
+            mat-raised-button
+            class="ml-3"
+            (click)="startIndexingOtherDbCollection()"
+          >
+            Start Indexing
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

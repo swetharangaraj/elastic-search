@@ -1,0 +1,11 @@
+xpack.monitoring.enabled: "true" 
+xpack.monitoring.elasticsearch.hosts: [ "https://kebs-prd.es.us-east-1.aws.found.io:9243" ]
+xpack.monitoring.elasticsearch.username: "elastic" 
+xpack.monitoring.elasticsearch.password: "3vPaqWVBAeLOu8aUeTY7WdFA"
+
+xpack.management.enabled: true
+xpack.management.elasticsearch.hosts :  [ "https://kebs-prd.es.us-east-1.aws.found.io:9243" ]
+xpack.management.elasticsearch.username: elastic
+xpack.management.elasticsearch.password: 3vPaqWVBAeLOu8aUeTY7WdFA
+xpack.management.logstash.poll_interval: 5s
+xpack.management.pipeline.id: ["*pipe"]

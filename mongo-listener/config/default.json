@@ -1,0 +1,4 @@
+{
+  "mongo_conn_str": "mongodb+srv://kebs:kebs123@dev.pkaby.mongodb.net",
+  "rabbit_mq_str": "amqp://localhost"
+}

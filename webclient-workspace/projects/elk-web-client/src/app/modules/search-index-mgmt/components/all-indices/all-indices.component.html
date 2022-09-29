@@ -1,0 +1,47 @@
+<div class="row mt-3">
+  <div class="col-12">
+    <h4 class="text-red-600 font-bold">Available indices</h4>
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="deleteIndices()"
+      [disabled]="rowData.length == 0"
+    >
+      Delete indices
+    </button>
+  </div>
+</div>
+
+<div class="row mt-2">
+  <div class="col-12">
+    <ag-grid-angular
+      style="height: 500px"
+      class="ag-theme-alpine"
+      [rowData]="rowData"
+      [columnDefs]="columnDefs"
+      [rowSelection]="rowSelection"
+      (selectionChanged)="onSelectionChanged($event)"
+      (gridReady)="onGridReady($event)"
+      [suppressRowClickSelection]="true"
+    >
+    </ag-grid-angular>
+  </div>
+</div>
+
+<div class="row mt-3">
+  <div class="col-12">
+    <h4 class="text-red-600 font-bold">Indices stats</h4>
+  </div>
+</div>
+
+<div class="row mt-2">
+  <div class="col-12">
+    <ag-grid-angular
+      style="height: 500px"
+      class="ag-theme-alpine"
+      [rowData]="stats"
+      [columnDefs]="columnDefsStats"
+    >
+    </ag-grid-angular>
+  </div>
+</div>

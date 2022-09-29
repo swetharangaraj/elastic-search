@@ -1,0 +1,9 @@
+apiVersion: ambassador/v1
+kind: Mapping
+name: web_application_mapping
+prefix: /
+rewrite: /
+service: web:80
+timeout_ms: 900000
+connect_timeout_ms: 900000
+idle_timeout_ms: 120000

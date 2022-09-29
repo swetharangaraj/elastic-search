@@ -1,0 +1,93 @@
+version: '3.7'
+services:
+  ambassador:
+    build:
+      context: gateway-configs
+    ports:
+      - 4200:8080
+    environment:
+      - AMBASSADOR_NO_KUBEWATCH=no_kubewatch
+    restart: on-failure
+
+  web:
+    build:
+      context: webclient-workspace
+    ports:
+      - 3000:80
+    logging:
+      options:
+        max-size: 10m
+
+  logstash:
+    image: logstash:8.0.0
+    ports:
+      - '5000:5000'
+    volumes:
+      - type: bind
+        source: ./pipelines/
+        target: /usr/share/logstash/pipeline
+        read_only: true
+      - type: bind
+        source: ./jdbc-connector/
+        target: /usr/share/logstash/jdbc-connector
+        read_only: true
+      - type: bind
+        source: ./logstash-config/logstash.yml
+        target: /usr/share/logstash/config/logstash.yml
+        read_only: true
+    restart: on-failure
+
+  search-mgmt-service:
+    build:
+      context: search-management
+    environment:
+      - NODE_ENV=dev
+      - PORT=6600
+      - WEB_PORT=web:3000
+    restart: on-failure
+    ports:
+      - 6600:6600
+    logging:
+      options:
+        max-size: 10m
+
+  mongo-listener-service:
+    build:
+      context: mongo-listener
+    environment:
+      - NODE_ENV=dev
+      - PORT=6700
+      - REDIS_SERVER_PORT=redis_db:6379
+    restart: on-failure
+    ports:
+      - 6700:6700
+    logging:
+      options:
+        max-size: 10m
+
+  mongo-worker-service:
+    build:
+      context: mongo-worker
+    environment:
+      - NODE_ENV=dev
+      - PORT=6702
+      - REDIS_SERVER_PORT=redis_db:6379
+    restart: on-failure
+    ports:
+      - 6702:6702
+    logging:
+      options:
+        max-size: 10m
+
+  redis_db:
+    container_name: redis_db
+    image: redis
+    restart: on-failure
+    ports:
+      - 6379:6379
+    environment:
+      - NODE_ENV=dev
+      - PORT=6379
+    command: bash -c "redis-server --appendonly yes --requirepass redisroot"
+    volumes:
+      - ./redis-volume:/data

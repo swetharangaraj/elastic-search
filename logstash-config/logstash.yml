@@ -1,0 +1,11 @@
+xpack.monitoring.enabled: "true" 
+xpack.monitoring.elasticsearch.hosts: [ "https://da4c006943d9463aa4a4e812273a399a.us-east-1.aws.found.io:9243" ]
+xpack.monitoring.elasticsearch.username: "elastic" 
+xpack.monitoring.elasticsearch.password: "s00oi2d6SoMmh2v5MYS2d4bb"
+
+xpack.management.enabled: true
+xpack.management.elasticsearch.hosts :  [ "https://da4c006943d9463aa4a4e812273a399a.us-east-1.aws.found.io:9243" ]
+xpack.management.elasticsearch.username: elastic
+xpack.management.elasticsearch.password: s00oi2d6SoMmh2v5MYS2d4bb
+xpack.management.logstash.poll_interval: 5s
+xpack.management.pipeline.id: ["*pipe"]

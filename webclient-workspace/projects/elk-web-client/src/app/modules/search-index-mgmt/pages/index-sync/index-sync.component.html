@@ -1,0 +1,156 @@
+<mat-stepper [linear]="true" #stepper>
+  <mat-step>
+    <!-- <form [formGroup]="firstFormGroup"> -->
+    <ng-template matStepLabel>Ingestion Mode</ng-template>
+    <p class="mt-3 text-base text-gray-500">
+      Selecting Database Sync allows you to sync tables / collections with
+      elastic search , and choosing REST APIs allows you to sync data using rest
+      API
+    </p>
+
+    <div class="row">
+      <div class="col-12">
+        <main class="mx-auto">
+          <div class="sm:text-center lg:text-left">
+            <h1
+              class="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl"
+            >
+              <span class="block text-indigo-600 xl:inline"
+                >Choose ingestion medium from which you need to sync data</span
+              >
+            </h1>
+            <p
+              class="mt-3 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0"
+            >
+              Selecting Mysql allows you to sync mysql tables with elastic
+              search and selecting Mongo Db allows you to sync mongo collections
+              with elastic search !
+            </p>
+            <div
+              class="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start"
+            >
+              <div
+                class="mt-3 sm:mt-0 sm:ml-3"
+                (click)="selectIngestionMode(ingestion_mode.value, stepper)"
+                style="cursor: pointer"
+                *ngFor="let ingestion_mode of ingestionMode"
+              >
+                <a
+                  class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 md:py-4 md:text-lg md:px-10"
+                >
+                  {{ ingestion_mode.label }}
+                </a>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <!-- </form> -->
+  </mat-step>
+
+  <!-------------------------------------  CHOOSE DATABASE TYPE-------------------------------------------------------->
+  <mat-step *ngIf="selectedIngestionMode == 'database_sync'">
+    <!-- <form [formGroup]="firstFormGroup"> -->
+    <ng-template matStepLabel>Database Type</ng-template>
+    <p class="mt-3 text-base text-gray-500">Choose Database Type</p>
+
+    <div class="row">
+      <div class="col-12">
+        <main class="mx-auto">
+          <div class="sm:text-center lg:text-left pb-5 border-bottom solid">
+            <h1
+              class="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl"
+            >
+              <span class="block text-indigo-600 xl:inline"
+                >Choose Database type from which you need to sync data</span
+              >
+            </h1>
+            <p
+              class="mt-3 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0"
+            >
+              Selecting Mysql allows you to sync mysql tables with elastic
+              search and selecting Mongo Db allows you to sync mongo collections
+              with elastic search !
+            </p>
+            <div
+              class="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start"
+            >
+              <div
+                class="mt-3 sm:mt-0 sm:ml-3"
+                (click)="selectdbType(dbtype.value, stepper)"
+                style="cursor: pointer"
+                *ngFor="let dbtype of dbTypes"
+              >
+                <a
+                  class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 md:py-4 md:text-lg md:px-10"
+                  [ngClass]="{
+                    'bg-indigo-700 text-white':
+                      selectedDatabaseType == dbtype.value
+                  }"
+                >
+                  {{ dbtype.label }}
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-3 sm:text-center lg:text-left">
+            <h1
+              class="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl"
+            >
+              <span class="block text-indigo-600 xl:inline"
+                >Choose retrieval Query type</span
+              >
+            </h1>
+            <div class="sm:flex sm:justify-center lg:justify-start">
+              <div
+                class="mt-3 sm:mt-0 sm:ml-3"
+                (click)="selectFetchMethod(method.value)"
+                style="cursor: pointer"
+                *ngFor="let method of fetchMethods"
+              >
+                <a
+                  class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 md:py-4 md:text-lg md:px-10"
+                  [ngClass]="{
+                    'bg-indigo-700 text-white':
+                      selectedFetchMethod == method.value
+                  }"
+                >
+                  {{ method.label }}
+                </a>
+              </div>
+              <div class="mt-3 sm:mt-0 sm:ml-3">
+                <button
+                  mat-mini-fab
+                  color="accent"
+                  (click)="moveFromDbTypeStep(stepper)"
+                >
+                  <mat-icon>done</mat-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <!-- </form> -->
+  </mat-step>
+  <!-------------------------------------  CHOOSE DATABASE TYPE ENDS -------------------------------------------------------->
+
+  <!-- -------------------------------------------EXECUTION TARGET FOR DATABASES--------------------------------------------------- -->
+
+  <mat-step *ngIf="selectedIngestionMode == 'database_sync'">
+    <ng-template matStepLabel>Execution Target</ng-template>
+    <exec-target-mysql
+      *ngIf="selectedDatabaseType == 'mysql'"
+    ></exec-target-mysql>
+    <exec-target-mongo
+      *ngIf="selectedDatabaseType == 'mongo'"
+    ></exec-target-mongo>
+  </mat-step>
+
+  <!-- -------------------------------------------EXECUTION TARGET FOR DATABASES ENDS--------------------------------------------------- -->
+</mat-stepper>

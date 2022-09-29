@@ -1,0 +1,20 @@
+{
+  "connectionLimit": "20",
+  "host": "kebs-mt-prd.cuvhrjf8xvdp.us-east-1.rds.amazonaws.com",
+  "rr_host": "kebs-mt-prd-rr.cuvhrjf8xvdp.us-east-1.rds.amazonaws.com",
+  "rr_user": "kebsclientrr",
+  "rr_password": "qs0UTEp1#AfR",
+  "user": "kebsclient",
+  "password": "or9$u0vf^mKT",
+  "port": "3306",
+  "debug": "false",
+  "timezone": "UTC+0",
+  "ssl": false,
+  "mongo_conn_str": "mongodb+srv://kebsmt:kebsmt@kebs-mt.mjvpu.mongodb.net",
+  "elastic_url": "https://kebs-prd.es.us-east-1.aws.found.io:9243",
+  "elasticApiKey": "MkYzLWlJTUIzNzFYNC1ieHFSbzY6cnI5SmlZaU5SSGFmQXY5QUJuUWx2QQ==",
+  "elastic_cloud_id": "kebs-prd:dXMtZWFzdC0xLmF3cy5mb3VuZC5pbzo0NDMkODJmMTE0Yzg2MzVhNGY3Mjg3NmY3MTQ4ZDA2NWQzODgkOGYxNDVmMjZlZmNhNDFmNGFiOWE3NTFkOWE2OGJjYjE=",
+  "elastic_user": "elastic",
+  "elastic_password": "3vPaqWVBAeLOu8aUeTY7WdFA",
+  "rabbit_mq_str": "amqps://mtadmin:!vLuP5wL^FXt@b-1ce815ed-7612-4e28-955c-b9e29263752f.mq.us-east-1.amazonaws.com:5671"
+}

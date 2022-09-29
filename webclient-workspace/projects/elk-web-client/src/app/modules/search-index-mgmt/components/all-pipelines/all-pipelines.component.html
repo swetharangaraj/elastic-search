@@ -1,0 +1,38 @@
+<div class="row mt-3">
+  <div class="col-12">
+    <h4 class="text-red-600 font-bold">Available Logstash pipelines</h4>
+  </div>
+</div>
+
+<div class="row mt-2">
+  <div class="col-12">
+    <ag-grid-angular
+      style="height: 26rem"
+      class="ag-theme-alpine"
+      [rowData]="logstashPipelines"
+      [columnDefs]="columnDefs"
+      [rowSelection]="rowSelection"
+      (selectionChanged)="onSelectionChanged($event)"
+      (gridReady)="onGridReady($event)"
+    >
+    </ag-grid-angular>
+  </div>
+</div>
+
+<div class="row mt-3">
+  <div class="col-12">
+    <h4 class="text-red-600 font-bold">Available Mongo pipelines</h4>
+  </div>
+</div>
+
+<div class="row mt-2">
+  <div class="col-12">
+    <ag-grid-angular
+      style="height: 26rem"
+      class="ag-theme-alpine"
+      [rowData]="mongoPipelines"
+      [columnDefs]="columnDefsMongoPipelines"
+    >
+    </ag-grid-angular>
+  </div>
+</div>

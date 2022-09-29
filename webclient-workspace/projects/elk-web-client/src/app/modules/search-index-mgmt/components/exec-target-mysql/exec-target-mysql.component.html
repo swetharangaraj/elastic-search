@@ -1,0 +1,443 @@
+<div class="row">
+  <div class="col-12">
+    <h4>Select the Target Databases to which you want to sync Data</h4>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-12">
+    <mat-button-toggle-group
+      name="fontStyle"
+      aria-label="Font Style"
+      [value]="selectedTargetDatabaseType"
+    >
+      <mat-button-toggle
+        [ngStyle]="{
+          background: selectedTargetDatabaseType == 'tad' ? 'bisque' : ''
+        }"
+        value="tad"
+        (click)="selectTargetDbType('tad')"
+        >Tenant Databases</mat-button-toggle
+      >
+      <mat-button-toggle
+        [ngStyle]="{
+          background: selectedTargetDatabaseType == 'other' ? 'bisque' : ''
+        }"
+        value="Other"
+        (click)="selectTargetDbType('other')"
+        >Other Databases</mat-button-toggle
+      >
+    </mat-button-toggle-group>
+  </div>
+</div>
+
+<div *ngIf="selectedTargetDatabaseType == 'tad' && baseDbTableNames.length > 0">
+  <div class="row">
+    <div class="col-5">
+      <div class="row mt-3">
+        <div class="col-12">Select the Table To be indexed</div>
+      </div>
+      <div class="row">
+        <div class="col-12">
+          <mat-form-field class="example-full-width" appearance="fill">
+            <mat-label>Table Name</mat-label>
+            <input
+              type="text"
+              placeholder="Pick one"
+              aria-label="Table Name"
+              matInput
+              [formControl]="tableNameControl"
+              [matAutocomplete]="auto"
+            />
+            <mat-autocomplete
+              autoActiveFirstOption
+              #auto="matAutocomplete"
+              (optionSelected)="changeInBaseTable($event)"
+            >
+              <mat-option
+                *ngFor="let option of tableNameFilteredOptions | async"
+                [value]="option"
+              >
+                {{ option }}
+              </mat-option>
+            </mat-autocomplete>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div class="row mt-3">
+        <div class="col-12">
+          Now choose the columns you want to index &nbsp;&nbsp;
+          <div
+            class="mt-6"
+            style="display: inline-block; cursor: pointer"
+            (click)="switchToTadSelectionView()"
+            *ngIf="baseTableColumnsToBeIndexed.length > 0"
+          >
+            <a
+              style="height: 10px"
+              class="flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700"
+              >Save Columns</a
+            >
+          </div>
+        </div>
+      </div>
+
+      <div class="row mt-2">
+        <ng-container cdkDropListGroup>
+          <div class="col-6">
+            <h2>Columns to be indexed</h2>
+            <div
+              cdkDropList
+              [cdkDropListData]="baseTableColumnsToBeIndexed"
+              class="example-list"
+              (cdkDropListDropped)="drop($event)"
+            >
+              <div
+                class="example-box"
+                *ngFor="let item of baseTableColumnsToBeIndexed"
+                cdkDrag
+              >
+                {{ item.Field }}
+
+                <span
+                  *ngIf="item.Key != ''"
+                  class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
+                >
+                  {{ item.Key }}
+                </span>
+
+                <span
+                  class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
+                >
+                  {{ item.Type }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-6">
+            <h2>Base Table columns</h2>
+
+            <div
+              cdkDropList
+              [cdkDropListData]="baseTableColumns"
+              class="example-list"
+              (cdkDropListDropped)="drop($event)"
+            >
+              <div
+                class="example-box"
+                *ngFor="let item of baseTableColumns"
+                cdkDrag
+              >
+                {{ item.Field }}
+                <span
+                  *ngIf="item.Key != ''"
+                  class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
+                >
+                  {{ item.Key }}
+                </span>
+
+                <span
+                  class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
+                >
+                  {{ item.Type }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+    <div class="col-6 ml-3" *ngIf="isTadSelectionListVisible == true">
+      <div class="row">
+        <div class="col-12 text-base">
+          Choose the Tenant Databases , you want to sync from
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-5 bg-gray-100">
+          <div
+            class="spinner-border"
+            role="status"
+            *ngIf="isFetchingAllowedDbs"
+          >
+            <span class="sr-only">Loading...</span>
+          </div>
+          <mat-selection-list
+            #allowedDbs
+            *ngIf="!isFetchingAllowedDbs"
+            (selectionChange)="databaseSelectionChange($event)"
+          >
+            <mat-list-option
+              *ngFor="let db of fullTableFetchApplicableDatabases"
+              [value]="db"
+              [disabled]="
+                db.is_index_available ||
+                !db.is_changed_on_valid ||
+                !db.is_active_present
+              "
+            >
+              {{ db.database }}
+              <span
+                *ngIf="db.is_index_available"
+                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-400 text-green-800"
+              >
+                Indexed already
+              </span>
+              <span
+                *ngIf="!db.is_changed_on_valid"
+                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-400 text-green-800"
+              >
+                changed_on field mismatch
+              </span>
+              <span
+                *ngIf="!db.is_active_present"
+                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-400 text-green-800"
+              >
+                no is_active col
+              </span>
+            </mat-list-option>
+          </mat-selection-list>
+        </div>
+      </div>
+
+      <div class="row mt-4">
+        <div class="col-12">
+          <span class="text-sm font-medium text-purple-500">
+            Verify whether the <b>dataTypes</b> and <b>keys</b> of the columns
+            matches with the columns present in the <b>tenant databases</b>
+          </span>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-2">
+          <button
+            mat-raised-button
+            color="primary"
+            [disabled]="selectedTadDbs.length == 0"
+            (click)="verify()"
+          >
+            Verify
+          </button>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-12">
+          <div class="flex flex-col">
+            <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+              <div
+                class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8"
+              >
+                <div
+                  class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg"
+                >
+                  <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                      <tr>
+                        <th
+                          scope="col"
+                          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                        >
+                          Tenant Db
+                        </th>
+                        <th
+                          scope="col"
+                          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                        >
+                          Mismatched Columns
+                        </th>
+                        <th
+                          scope="col"
+                          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                        >
+                          Sync allowed
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                      <tr *ngFor="let tad of tadSyncPermissionData">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                          <div class="flex items-center">
+                            <div class="ml-4">
+                              <div class="text-sm font-medium text-gray-900">
+                                <span
+                                  [ngStyle]="{
+                                    textDecoration: tad.restricSync
+                                      ? 'line-through'
+                                      : 'none'
+                                  }"
+                                  >{{ tad.database }}</span
+                                >
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                          <div
+                            class="text-sm text-gray-500"
+                            *ngFor="let col of tad.columns_status"
+                          >
+                            <span
+                              style="text-decoration: line-through"
+                              *ngIf="col.mismatch"
+                            >
+                              {{ col.Field }} ({{ col.Type }})
+                            </span>
+                          </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                          <span
+                            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
+                            [ngClass]="
+                              tad.restricSync
+                                ? 'bg-red-200 text-red-700'
+                                : 'bg-green-100 text-green-800'
+                            "
+                          >
+                            {{ tad.restricSync ? "Restricted" : "Allowed" }}
+                          </span>
+                        </td>
+                      </tr>
+
+                      <!-- More people... -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="alert alert-warning" role="alert">
+        Only the allowed tenant databases will be synced to Elastic search!
+        click to proceed to next step
+      </div>
+      <div class="row">
+        <div class="col-12">
+          <button
+            mat-raised-button
+            color="primary"
+            [disabled]="selectedTadDbs.length == 0"
+            (click)="proceedToFinalStep()"
+          >
+            Proceed
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="selectedTargetDatabaseType == 'other'">
+  <div class="row mt-2">
+    <div class="col-12">select the database</div>
+  </div>
+  <div class="row mt-2">
+    <div class="col-12">
+      <mat-form-field appearance="fill">
+        <mat-label>Select database</mat-label>
+        <mat-select [formControl]="otherDataBaseFormCtrl">
+          <mat-option *ngFor="let db of otherDatabaseList" [value]="db">{{
+            db
+          }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+  </div>
+
+  <div class="row mt-2">
+    <div class="col-12">select the table</div>
+  </div>
+  <div class="row mt-2">
+    <div class="col-12">
+      <mat-form-field appearance="fill">
+        <mat-label>Select table</mat-label>
+        <mat-select [formControl]="selectedOtherDbTableCtrl">
+          <mat-option
+            *ngFor="let table of selectedOtherDbTableList"
+            [value]="table"
+            >{{ table }}</mat-option
+          >
+        </mat-select>
+      </mat-form-field>
+    </div>
+  </div>
+
+  <div class="row mt-2">
+    <ng-container cdkDropListGroup>
+      <div class="col-6">
+        <h2>Columns to be indexed</h2>
+        <div
+          cdkDropList
+          [cdkDropListData]="selectedOtherTableColumns"
+          class="example-list"
+          (cdkDropListDropped)="drop($event)"
+        >
+          <div
+            class="example-box"
+            *ngFor="let item of selectedOtherTableColumns"
+            cdkDrag
+          >
+            {{ item.Field }}
+
+            <span
+              *ngIf="item.Key != ''"
+              class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
+            >
+              {{ item.Key }}
+            </span>
+
+            <span
+              class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
+            >
+              {{ item.Type }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-6">
+        <h2>sql Table columns</h2>
+
+        <div
+          cdkDropList
+          [cdkDropListData]="otherTableColumns"
+          class="example-list"
+          (cdkDropListDropped)="drop($event)"
+        >
+          <div
+            class="example-box"
+            *ngFor="let item of otherTableColumns"
+            cdkDrag
+          >
+            {{ item.Field }}
+            <span
+              *ngIf="item.Key != ''"
+              class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
+            >
+              {{ item.Key }}
+            </span>
+
+            <span
+              class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
+            >
+              {{ item.Type }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+
+  <div class="row mt-2">
+    <div class="col-12">
+      <button mat-raised-button (click)="proceedToMappingOtherTab()">
+        Proceed to mapping and pipeline creation
+      </button>
+    </div>
+  </div>
+</div>

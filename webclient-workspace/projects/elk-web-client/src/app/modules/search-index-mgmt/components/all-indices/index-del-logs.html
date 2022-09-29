@@ -1,0 +1,27 @@
+<div class="row mt-2">
+  <div class="col-11">
+    <strong>LOGS</strong>&nbsp;&nbsp;
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="dialogRef.close();reload()"
+    >
+      close
+    </button>
+  </div>
+</div>
+
+<div class="row mt-2">
+  <div class="col-12">
+    <pre>
+            {{logs|json}}
+            </pre
+    >
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-12">
+    <button mat-raised-button color="primary" (click)="reload()">Reload</button>
+  </div>
+</div>
