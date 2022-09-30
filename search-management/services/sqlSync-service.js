@@ -118,6 +118,11 @@ module.exports.listDatabases = async (req, res) => {
 
 module.exports.listTables = async (req, res) => {
   try {
+    let base_table = await mongo.client
+      .db("elastic_management")
+      .collection("m_db_sync_config")
+      .findOne({ database_type: "mysql" });
+    console.log(base_table);
     let list_table_query = `SHOW TABLES FROM ${req.params.db}`;
     let result = await rpool(list_table_query);
 
