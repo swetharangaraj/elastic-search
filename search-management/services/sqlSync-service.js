@@ -118,12 +118,12 @@ module.exports.listDatabases = async (req, res) => {
 
 module.exports.listTables = async (req, res) => {
   try {
-    let base_table = await mongo.client
+    let base_db_configs = await mongo.client
       .db("elastic_management")
       .collection("m_db_sync_config")
       .findOne({ database_type: "mysql" });
-    console.log(base_table);
-    let list_table_query = `SHOW TABLES FROM ${req.params.db}`;
+    let base_db = base_db_configs.base_database;
+    let list_table_query = `SHOW TABLES FROM ${base_db}`;
     let result = await rpool(list_table_query);
 
     const transformed = result.map((a) => Object.values(a)[0]);
