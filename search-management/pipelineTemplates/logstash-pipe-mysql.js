@@ -2,7 +2,7 @@ exports.template = `input {
     
     jdbc{
         jdbc_connection_string => "jdbc:mysql://[mysql_host]/[database]?zeroDateTimeBehavior=convertToNull"
-        jdbc_user => "admin"
+        jdbc_user => "[mysqlUser]"
         jdbc_password => "[mysqlPass]"
         jdbc_driver_library => "/usr/share/logstash/jdbc-connector/mysql-connector-java-8.0.28/mysql-connector-java-8.0.28.jar"
         jdbc_driver_class => "com.mysql.jdbc.Driver"

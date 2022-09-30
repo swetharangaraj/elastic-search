@@ -40,7 +40,7 @@ module.exports = {
         .aggregate([
           {
             $project: {
-              index_name:1,
+              index_name: 1,
               pipeline_id: 1,
               db_name: 1,
               table_name: 1,
@@ -57,7 +57,7 @@ module.exports = {
         });
         pipelines.push({
           pipeline_name: property,
-          index_name:pipeline.length > 0 ? pipeline[0].index_name : null,
+          index_name: pipeline.length > 0 ? pipeline[0].index_name : null,
           table_name: pipeline.length > 0 ? pipeline[0].table_name : null,
           db_name: pipeline.length > 0 ? pipeline[0].db_name : null,
           last_modified: response.data[property].last_modified,
@@ -151,6 +151,10 @@ module.exports = {
         implicit_template = implicit_template.replace(
           "[mysql_host]",
           config.host
+        );
+        implicit_template = implicit_template.replace(
+          "[mysqlUser]",
+          config.user
         );
         implicit_template = implicit_template.replace(
           "[mysqlPass]",
@@ -283,7 +287,7 @@ module.exports = {
     try {
       let mongo_pipelines = await mongo.client
         .db("elastic_management")
-        .collection('t_mongo_pipelines')
+        .collection("t_mongo_pipelines")
         .find()
         .toArray();
       res.status(200).send({
