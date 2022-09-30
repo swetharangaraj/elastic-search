@@ -14,7 +14,6 @@ const _ = require("underscore");
 module.exports.listDatabases = async (req, res) => {
   try {
     const base_table_name = req.params.baseDbTableName;
-    const base_db_name = req.params.baseDbName;
     let list_db_query = `SHOW DATABASES`;
     let mysql_available_dbs = await rpool(list_db_query);
 
@@ -153,7 +152,13 @@ module.exports.listTables = async (req, res) => {
 
 module.exports.describeBaseTable = async (req, res) => {
   try {
-    let desc_query = `DESCRIBE ${req.params.db}.${req.params.table}`;
+    let base_db_configs = await mongo.client
+    .db("elastic_management")
+    .collection("m_db_sync_config")
+    .findOne({ database_type: "mysql" });
+  let base_db = base_db_configs.base_database;
+
+    let desc_query = `DESCRIBE ${base_db}.${req.params.table}`;
     let result = await rpool(desc_query);
 
     res.status(200).send({

@@ -26,7 +26,7 @@ export class ExecTargetMysqlComponent implements OnInit {
   tableNameFilteredOptions!: Observable<string[]>;
   fullTableFetchApplicableDatabases: any[] = [];
   isFetchingAllowedDbs: boolean = false;
-  baseDb: string = 'kaar';
+  baseDb: string = 'null';
   baseTableColumns: any = [];
   baseTableColumnsToBeIndexed: any = [];
   isTadSelectionListVisible: boolean = false;
