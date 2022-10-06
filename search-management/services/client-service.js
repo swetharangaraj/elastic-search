@@ -862,6 +862,8 @@ module.exports = {
         feature_enabled_tenants = general_configs[0].deployed_tenants;
       }
 
+      console.log(feature_enabled_tenants)
+
       res.status(200).send({
         err: false,
         message: "search bar accessible roleids retrieved",
