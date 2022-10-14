@@ -34,6 +34,15 @@ export class ExecTargetMysqlComponent implements OnInit {
   selectedBaseTable!: string;
   tadSyncPermissionData: any = [];
 
+  /***
+   * custom query
+   */
+  isCustomQuery: boolean = false;
+  selectStatement!: string;
+  fromTable!: string;
+  optionalWhere!: string;
+  mandatoryWhere: string = `(UNIX_TIMESTAMP(changed_on) > :sql_last_value AND changed_on < NOW() AND is_active = 1) order by changed_on ASC`;
+
   constructor(
     private _es: EsManagementService,
     private _snack: MatSnackBar,

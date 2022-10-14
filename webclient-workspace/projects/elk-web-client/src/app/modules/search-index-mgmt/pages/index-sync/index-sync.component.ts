@@ -49,6 +49,6 @@ export class IndexSyncComponent implements OnInit {
   }
 
   moveFromDbTypeStep(stepper: MatStepper) {
-    if (this.selectedDatabaseType && this.selectFetchMethod) stepper.next();
+    if (this.selectedDatabaseType && this.selectedFetchMethod) stepper.next();
   }
 }

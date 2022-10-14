@@ -28,10 +28,24 @@
         >Other Databases</mat-button-toggle
       >
     </mat-button-toggle-group>
+    &nbsp;&nbsp;
+    <input
+      type="checkbox"
+      id="customQuery"
+      name="customQuery"
+      [(ngModel)]="isCustomQuery"
+    />
+    <label for="vehicle3">Custom Query</label><br />
   </div>
 </div>
 
-<div *ngIf="selectedTargetDatabaseType == 'tad' && baseDbTableNames.length > 0">
+<div
+  *ngIf="
+    selectedTargetDatabaseType == 'tad' &&
+    baseDbTableNames.length > 0 &&
+    !isCustomQuery
+  "
+>
   <div class="row">
     <div class="col-5">
       <div class="row mt-3">
@@ -332,7 +346,7 @@
   </div>
 </div>
 
-<div *ngIf="selectedTargetDatabaseType == 'other'">
+<div *ngIf="selectedTargetDatabaseType == 'other' && !isCustomQuery">
   <div class="row mt-2">
     <div class="col-12">select the database</div>
   </div>
@@ -438,6 +452,68 @@
       <button mat-raised-button (click)="proceedToMappingOtherTab()">
         Proceed to mapping and pipeline creation
       </button>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="isCustomQuery">
+  <div class="row">Enter the query</div>
+  <div class="row">
+    <div class="col-12">
+      <textarea
+        id="query-main"
+        name="query-main"
+        rows="4"
+        cols="50"
+        style="border: solid 1px"
+        [(ngModel)]="selectStatement"
+      >
+      </textarea>
+    </div>
+  </div>
+  <div class="row">AS unix_ts_in_secs FROM</div>
+  <div class="row">
+    <div class="col-12">
+      <textarea
+        id="table_from"
+        name="table_from"
+        rows="1"
+        cols="50"
+        style="border: solid 1px"
+        [(ngModel)]="fromTable"
+      >
+      table name
+      </textarea>
+    </div>
+  </div>
+
+  <div class="row">WHERE</div>
+  <div class="row">
+    <div class="col-12">
+      <textarea
+        id="where-cond"
+        name="where-cond"
+        rows="4"
+        cols="50"
+        style="border: solid 1px"
+        [(ngModel)]="optionalWhere"
+      >
+      </textarea>
+    </div>
+  </div>
+  <div class="row" *ngIf="optionalWhere">AND</div>
+  <div class="row">
+    <div class="col-12">
+      <textarea
+        id="where-cond-mand"
+        name="where-cond-mand"
+        rows="4"
+        cols="50"
+        style="border: solid 1px"
+        [(ngModel)]="mandatoryWhere"
+        readonly
+      >
+      </textarea>
     </div>
   </div>
 </div>
