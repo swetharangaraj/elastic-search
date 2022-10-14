@@ -752,7 +752,7 @@ module.exports = {
             index_name: entry.index_info.index_name,
           });
         entry.row_data = row_data_result.fields;
-        entry.row_data.forEach();
+        entry.timestamp = new Date();
       }
       let result = await mongo.client
         .db("elastic_management")
@@ -792,6 +792,7 @@ module.exports = {
           domain: domain,
           user: user,
         })
+        .sort({ timestamp: -1 })
         .toArray();
       res.status(200).send({
         err: false,
@@ -862,7 +863,7 @@ module.exports = {
         feature_enabled_tenants = general_configs[0].deployed_tenants;
       }
 
-      console.log(feature_enabled_tenants)
+      console.log(feature_enabled_tenants);
 
       res.status(200).send({
         err: false,
