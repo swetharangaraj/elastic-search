@@ -752,8 +752,8 @@ module.exports = {
             index_name: entry.index_info.index_name,
           });
         entry.row_data = row_data_result.fields;
-        entry.timestamp = new Date();
       }
+      entry.timestamp = new Date();
       let result = await mongo.client
         .db("elastic_management")
         .collection("t_recent_searches")
