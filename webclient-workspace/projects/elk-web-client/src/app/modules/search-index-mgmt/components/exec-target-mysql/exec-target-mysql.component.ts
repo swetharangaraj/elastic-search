@@ -14,6 +14,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { ToastrService } from 'ngx-toastr';
 import { MatDialog } from '@angular/material/dialog';
 import { SyncFinalStepComponent } from '../sync-final-step/sync-final-step.component';
+import { MatChipInputEvent } from '@angular/material/chips';
+import { COMMA, ENTER } from '@angular/cdk/keycodes';
 @Component({
   selector: 'exec-target-mysql',
   templateUrl: './exec-target-mysql.component.html',
@@ -40,9 +42,15 @@ export class ExecTargetMysqlComponent implements OnInit {
   isCustomQuery: boolean = false;
   selectStatement!: string;
   fromTable!: string;
+  joinStatement!: string;
   optionalWhere!: string;
   mandatoryWhere: string = `(UNIX_TIMESTAMP(changed_on) > :sql_last_value AND changed_on < NOW() AND is_active = 1) order by changed_on ASC`;
+  testableQuery!: string;
+  finalQuery!: string;
+  testableDatabases: any = [];
+  queryTestResults: any = [];
 
+  readonly separatorKeysCodes = [ENTER, COMMA] as const;
   constructor(
     private _es: EsManagementService,
     private _snack: MatSnackBar,
@@ -127,8 +135,12 @@ export class ExecTargetMysqlComponent implements OnInit {
         },
       });
 
+    this.getTableFetchModeDbs(this.baseDb, table);
+  }
+
+  getTableFetchModeDbs(baseDb: string, table: string) {
     this._es
-      .getTableFetchModeDbs(this.baseDb, table)
+      .getTableFetchModeDbs(baseDb, table)
       .pipe(pluck('data'))
       .subscribe({
         next: (res: any) => {
@@ -348,5 +360,72 @@ export class ExecTargetMysqlComponent implements OnInit {
         'ensure PRI, changed_on and minimum 3 fields are present'
       );
     }
+  }
+
+  /***custom query methods */
+  generateQuery = () => {
+    if (this.selectStatement && this.fromTable) {
+      this.testableQuery = `${this.selectStatement.replace(
+        '\n',
+        ' '
+      )} AS unix_ts_in_secs FROM ${this.fromTable} ${
+        this.joinStatement ? this.joinStatement.replace('\n', ' ') : ''
+      } ${this.optionalWhere ? 'WHERE ' + this.optionalWhere : ''} LIMIT 1`;
+
+      this.finalQuery = `${this.selectStatement.replace(
+        '\n',
+        ' '
+      )} AS unix_ts_in_secs FROM ${this.fromTable} ${
+        this.joinStatement ? this.joinStatement.replace('\n', ' ') : ''
+      } WHERE ${this.optionalWhere ? this.optionalWhere + ' AND' : ''}  ${
+        this.mandatoryWhere
+      }`;
+    }
+
+    this.testableQuery = this.testableQuery.replaceAll('\n', ' ');
+    this.finalQuery = this.finalQuery.replaceAll('\n', ' ');
+  };
+
+  add(event: MatChipInputEvent): void {
+    const value = (event.value || '').trim();
+
+    if (value) {
+      this.testableDatabases.push(value);
+    }
+    event.chipInput!.clear();
+  }
+  remove(field: string): void {
+    const index = this.testableDatabases.indexOf(field);
+
+    if (index >= 0) {
+      this.testableDatabases.splice(index, 1);
+    }
+  }
+
+  testQuery() {
+    this.testableDatabases.forEach((db: string) => {
+      let testQueryString = this.testableQuery.replaceAll('db_name', db);
+      let finalQueryString = this.finalQuery.replaceAll('db_name', db);
+      console.log(this.testableQuery);
+      this._es.testQuery(testQueryString).subscribe({
+        next: (res) => {
+          this.queryTestResults.push({
+            db: db,
+            testQuery: testQueryString,
+            actualQuery: finalQueryString,
+            testResult: 'success',
+          });
+        },
+        error: (err) => {
+          this.queryTestResults.push({
+            db: db,
+            testQuery: testQueryString,
+            actualQuery: finalQueryString,
+            testResult: 'failed',
+            err: err,
+          });
+        },
+      });
+    });
   }
 }

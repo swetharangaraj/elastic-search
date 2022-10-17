@@ -151,4 +151,10 @@ export class EsManagementService {
       db_name: database,
     });
   }
+
+  testQuery(queryString: string) {
+    return this.$http.post('/api/sqlSync/v1/testQuery', {
+      query_string: queryString,
+    });
+  }
 }

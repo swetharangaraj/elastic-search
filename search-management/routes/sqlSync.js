@@ -91,4 +91,15 @@ router.get(
  */
 router.post("/v1/getMappings", sqlsync_service.getMappings);
 
+/**
+ * Route Test Query
+ * @name post/api/sqlSync/v1/testQuery
+ * @function
+ * @memberof module:routers/sqlSync~sqlSyncRouter
+ * @inner
+ * @param {string} path - Express path
+ * @param {callback} middleware - Express middleware.
+ */
+ router.post("/v1/testQuery", sqlsync_service.testQuery);
+
 module.exports = router;

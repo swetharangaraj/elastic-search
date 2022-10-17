@@ -153,10 +153,10 @@ module.exports.listTables = async (req, res) => {
 module.exports.describeBaseTable = async (req, res) => {
   try {
     let base_db_configs = await mongo.client
-    .db("elastic_management")
-    .collection("m_db_sync_config")
-    .findOne({ database_type: "mysql" });
-  let base_db = base_db_configs.base_database;
+      .db("elastic_management")
+      .collection("m_db_sync_config")
+      .findOne({ database_type: "mysql" });
+    let base_db = base_db_configs.base_database;
 
     let desc_query = `DESCRIBE ${base_db}.${req.params.table}`;
     let result = await rpool(desc_query);
@@ -400,6 +400,33 @@ module.exports.getOtherDatabasesList = async (req, res) => {
       err: false,
       data: final_other_dbs,
       message: "Other databases retrieved successfully!",
+    });
+  } catch (err) {
+    console.error(err);
+    logger.error(err);
+    res.status(501).send({
+      err: true,
+      message: err,
+    });
+  }
+};
+
+/**
+ * testQuery
+ * @param  {*} req
+ * @param  {*} res
+ * @author Amal Anush a
+ * @version 1.0
+ */
+
+module.exports.testQuery = async (req, res) => {
+  try {
+    let query = req.body.query_string;
+
+    let result = await pool(query);
+    res.status(200).send({
+      err: false,
+      message: "success",
     });
   } catch (err) {
     console.error(err);

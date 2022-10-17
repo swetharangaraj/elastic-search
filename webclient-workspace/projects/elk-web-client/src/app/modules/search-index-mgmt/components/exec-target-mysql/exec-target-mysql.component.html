@@ -457,63 +457,133 @@
 </div>
 
 <div *ngIf="isCustomQuery">
-  <div class="row">Enter the query</div>
   <div class="row">
     <div class="col-12">
-      <textarea
-        id="query-main"
-        name="query-main"
-        rows="4"
-        cols="50"
-        style="border: solid 1px"
-        [(ngModel)]="selectStatement"
-      >
-      </textarea>
+      <div class="row">Enter the query</div>
+      <div class="row">
+        <div class="col-12">
+          <textarea
+            id="query-main"
+            name="query-main"
+            rows="4"
+            cols="50"
+            style="border: solid 1px"
+            [(ngModel)]="selectStatement"
+          >
+          </textarea>
+        </div>
+      </div>
+      <div class="row">AS unix_ts_in_secs FROM</div>
+      <div class="row">
+        <div class="col-12">
+          <textarea
+            id="table_from"
+            name="table_from"
+            rows="1"
+            cols="50"
+            style="border: solid 1px"
+            [(ngModel)]="fromTable"
+          >
+        table name
+        </textarea
+          >
+        </div>
+      </div>
+      <div class="row">(Add Joins below)</div>
+      <div class="row">
+        <div class="col-12">
+          <textarea
+            id="table_from"
+            name="table_from"
+            rows="5"
+            cols="50"
+            style="border: solid 1px"
+            [(ngModel)]="joinStatement"
+          >
+          </textarea>
+        </div>
+      </div>
+
+      <div class="row">WHERE</div>
+      <div class="row">
+        <div class="col-12">
+          <textarea
+            id="where-cond"
+            name="where-cond"
+            rows="4"
+            cols="50"
+            style="border: solid 1px"
+            [(ngModel)]="optionalWhere"
+          >
+          </textarea>
+        </div>
+      </div>
+      <div class="row" *ngIf="optionalWhere">AND</div>
+      <div class="row">
+        <div class="col-12">
+          <textarea
+            id="where-cond-mand"
+            name="where-cond-mand"
+            rows="4"
+            cols="50"
+            style="border: solid 1px"
+            [(ngModel)]="mandatoryWhere"
+            readonly
+          >
+          </textarea>
+        </div>
+      </div>
     </div>
   </div>
-  <div class="row">AS unix_ts_in_secs FROM</div>
+  <div class="generate-query">
+    <button (click)="generateQuery()" style="background: gray; color: white">
+      Generate Query
+    </button>
+    <div class="row mt-3">
+      <strong>Generated Query</strong>
+    </div>
+    <div class="row">
+      {{ finalQuery }}
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12">databases</div>
+  </div>
   <div class="row">
     <div class="col-12">
-      <textarea
-        id="table_from"
-        name="table_from"
-        rows="1"
-        cols="50"
-        style="border: solid 1px"
-        [(ngModel)]="fromTable"
-      >
-      table name
-      </textarea>
+      <mat-form-field class="example-chip-list" appearance="fill">
+        <mat-label>columns</mat-label>
+        <mat-chip-list #chipList aria-label="field selection">
+          <mat-chip *ngFor="let db of testableDatabases" (removed)="remove(db)">
+            {{ db }}
+            <button matChipRemove>
+              <mat-icon>cancel</mat-icon>
+            </button>
+          </mat-chip>
+          <input
+            placeholder="New field..."
+            [matChipInputFor]="chipList"
+            [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+            [matChipInputAddOnBlur]="true"
+            (matChipInputTokenEnd)="add($event)"
+          />
+        </mat-chip-list>
+      </mat-form-field>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12">
+      <button (click)="testQuery()" style="background: gray; color: white">
+        Test Query
+      </button>
     </div>
   </div>
 
-  <div class="row">WHERE</div>
-  <div class="row">
+  <div class="row mt-3">
     <div class="col-12">
-      <textarea
-        id="where-cond"
-        name="where-cond"
-        rows="4"
-        cols="50"
-        style="border: solid 1px"
-        [(ngModel)]="optionalWhere"
-      >
-      </textarea>
-    </div>
-  </div>
-  <div class="row" *ngIf="optionalWhere">AND</div>
-  <div class="row">
-    <div class="col-12">
-      <textarea
-        id="where-cond-mand"
-        name="where-cond-mand"
-        rows="4"
-        cols="50"
-        style="border: solid 1px"
-        [(ngModel)]="mandatoryWhere"
-        readonly
-      >
-      </textarea>
+      <pre>
+        {{queryTestResults|json}}
+      </pre>
     </div>
   </div>
 </div>
