@@ -1,0 +1,215 @@
+<div class="row">
+  <div class="col-12">
+    Databases to be synced
+    <ul>
+      <li *ngFor="let db of data">
+        <strong>{{ db.db }}</strong>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="mt-2">Generated mapping</div>
+<div class="row mt-2 bg-gray-100">
+  <div class="col-12">
+    <span class="text-xs font-serif text-gray-600">
+      <pre>
+           {{ generatedMapping | json }} 
+        </pre
+      >
+    </span>
+  </div>
+</div>
+
+<div class="row mt-2">
+  <div class="col-12">Index Prefix</div>
+</div>
+
+<div class="row mt-2">
+  <div class="col-12">
+    <mat-form-field appearance="fill">
+      <mat-label>Index Prefix</mat-label>
+      <input matInput [formControl]="indexPrefix" />
+    </mat-form-field>
+  </div>
+</div>
+
+<div class="row mt-2">
+  <div class="col-12">Index to be generated</div>
+</div>
+
+<div class="row mt-2">
+  <div class="col-12">
+    <ul>
+      <li *ngFor="let db of data">
+        <strong>{{ indexPrefix.value + "_" + db.db }}</strong>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="row mt-2">
+  <div class="col-12">Index Primary Key</div>
+</div>
+
+<div class="row mt-2">
+  <div class="col-12">
+    <mat-form-field appearance="fill">
+      <mat-label>Index Primary Key</mat-label>
+      <input matInput [formControl]="primaryKeyFieldctrl" />
+    </mat-form-field>
+  </div>
+</div>
+
+<div class="row mt-2">
+  <div class="col-12">Index alias name</div>
+</div>
+
+<div class="row mt-2">
+  <div class="col-12">
+    <mat-form-field appearance="fill">
+      <mat-label>Index alias</mat-label>
+      <input matInput [formControl]="indexAlias" />
+    </mat-form-field>
+  </div>
+</div>
+
+<div class="row mt-2">
+  <div class="col-12">Index Route Url</div>
+</div>
+
+<div class="row mt-2">
+  <div class="col-12">
+    <mat-form-field appearance="fill">
+      <mat-label>index route url</mat-label>
+      <input matInput [formControl]="routeUrl" />
+    </mat-form-field>
+  </div>
+</div>
+
+<div class="row mt-2">
+  <div class="col-12">
+    Determine the role groups to which the index is accessible
+  </div>
+</div>
+
+<div class="row mt-2">
+  <div class="col-12">
+    <mat-form-field class="example-chip-list" appearance="fill">
+      <mat-label>Role groups</mat-label>
+      <mat-chip-list #chipList>
+        <mat-chip
+          *ngFor="let role of selectedRoleGroups; let i = index"
+          (removed)="remove(i)"
+        >
+          {{ role.role_name }}|{{ role.role_id }}
+          <button matChipRemove>
+            <mat-icon>cancel</mat-icon>
+          </button>
+        </mat-chip>
+        <input
+          placeholder="New Role Group..."
+          #roleGrpInput
+          [formControl]="roleGroupCtrl"
+          [matAutocomplete]="auto"
+          [matChipInputFor]="chipList"
+          [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+        />
+      </mat-chip-list>
+      <mat-autocomplete
+        #auto="matAutocomplete"
+        (optionSelected)="selected($event)"
+      >
+        <mat-option
+          *ngFor="let role of filteredRoleGroups | async"
+          [value]="role"
+        >
+          {{ role.role_name }}
+        </mat-option>
+      </mat-autocomplete>
+    </mat-form-field>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-12">
+    <button mat-raised-button class="ml-3" (click)="generatePipelines()">
+      Generate pipelines
+    </button>
+  </div>
+</div>
+
+<div class="row mt-2">
+  <div class="col-12">
+    <mat-list>
+      <div mat-subheader>Generated pipelines</div>
+      <mat-list-item *ngFor="let pipeline of generatedPipelines">
+        <mat-icon mat-list-icon>folder</mat-icon>
+        <div mat-line>{{ pipeline.pipeline_name }}</div>
+        <span
+          style="text-decoration: underline; cursor: pointer"
+          (click)="changePipelineView(pipeline)"
+          >view</span
+        >
+      </mat-list-item>
+      <mat-divider></mat-divider>
+    </mat-list>
+  </div>
+</div>
+
+<ng-container *ngIf="view == 'pipeline' && selectedPipeline">
+  <div class="row">
+    <div class="col-10">
+      <h2 mat-dialog-title>{{ selectedPipeline.pipeline_name }}</h2>
+    </div>
+    <div class="col-2">
+      <button mat-icon-button (click)="view = 'overview'">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12 bg-gray-100">
+      <pre>  {{ selectedPipeline.pipeline_obj.pipeline }}</pre>
+    </div>
+  </div>
+</ng-container>
+<div class="row">
+  <div class="col-12">
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">index</th>
+          <th scope="col">is Elastic Index Created</th>
+          <th scope="col">is  Mongo Index Created</th>
+          <th scope="col">is Pipeline Created</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of finalIndexCreationResult; let i = index">
+          <th scope="row">{{ i + 1 }}</th>
+          <td>{{ item.index }}</td>
+          <td>{{ item.isElasticIndexCreated ? "✅" : "❌" }}</td>
+          <td>{{ item.isMongoIndexCreated ? "✅" : "❌" }}</td>
+          <td>{{ item.isPipelineCreated ? "✅" : "❌" }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+      <button
+        mat-raised-button
+        color="primary"
+        [disabled]="disableCreateIndex"
+        (click)="startIndexing()"
+      >
+        Start Indexing
+      </button>
+    </div>
+  </div>
+
+<pre>{{ data | json }}</pre>

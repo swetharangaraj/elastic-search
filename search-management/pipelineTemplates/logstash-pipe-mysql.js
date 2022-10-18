@@ -12,7 +12,7 @@ exports.template = `input {
         tracking_column => "unix_ts_in_secs"
         jdbc_paging_enabled => true
         schedule => "* * * * *"
-        statement => "SELECT [columns],UNIX_TIMESTAMP(changed_on) AS unix_ts_in_secs FROM [table] where (UNIX_TIMESTAMP(changed_on) > :sql_last_value AND changed_on < NOW() AND is_active = 1) order by changed_on ASC"
+        statement => "[select_statement]"
 
     }
 

@@ -16,6 +16,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { SyncFinalStepComponent } from '../sync-final-step/sync-final-step.component';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
+import { MysqlCustomQueryComponent } from '../mysql-custom-query/mysql-custom-query.component';
 @Component({
   selector: 'exec-target-mysql',
   templateUrl: './exec-target-mysql.component.html',
@@ -413,6 +414,7 @@ export class ExecTargetMysqlComponent implements OnInit {
             db: db,
             testQuery: testQueryString,
             actualQuery: finalQueryString,
+            generalQuery: this.finalQuery,
             testResult: 'success',
           });
         },
@@ -421,6 +423,7 @@ export class ExecTargetMysqlComponent implements OnInit {
             db: db,
             testQuery: testQueryString,
             actualQuery: finalQueryString,
+            generalQuery: this.finalQuery,
             testResult: 'failed',
             err: err,
           });
@@ -428,4 +431,15 @@ export class ExecTargetMysqlComponent implements OnInit {
       });
     });
   }
+
+  syncCustomSqlQuery = () => {
+    const dialogRef = this.dialog.open(MysqlCustomQueryComponent, {
+      disableClose: true,
+      data: _.where(this.queryTestResults, { testResult: 'success' }),
+      maxWidth: '100vw',
+      maxHeight: '100vh',
+      width: '80%',
+      height: '90%',
+    });
+  };
 }

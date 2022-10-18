@@ -528,7 +528,6 @@
             cols="50"
             style="border: solid 1px"
             [(ngModel)]="mandatoryWhere"
-            readonly
           >
           </textarea>
         </div>
@@ -582,8 +581,20 @@
   <div class="row mt-3">
     <div class="col-12">
       <pre>
-        {{queryTestResults|json}}
+        {{ queryTestResults | json }}
       </pre>
     </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-12">
+    <button
+      type="button"
+      (click)="syncCustomSqlQuery()"
+      style="background: gray; color: white"
+    >
+      Proceed with successfull databases
+    </button>
   </div>
 </div>

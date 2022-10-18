@@ -26,6 +26,7 @@ import { AllIndicesComponent, IndexDeletionLogsComponent } from './components/al
 import { AgGridModule } from 'ag-grid-angular';
 import { AllPipelinesComponent } from './components/all-pipelines/all-pipelines.component';
 import { RoleMgmtComponent } from './pages/role-mgmt/role-mgmt.component';
+import { MysqlCustomQueryComponent } from './components/mysql-custom-query/mysql-custom-query.component';
 @NgModule({
   declarations: [
     SiMgmtHomeComponent,
@@ -38,6 +39,7 @@ import { RoleMgmtComponent } from './pages/role-mgmt/role-mgmt.component';
     IndexDeletionLogsComponent,
     AllPipelinesComponent,
     RoleMgmtComponent,
+    MysqlCustomQueryComponent,
   ],
   imports: [
     CommonModule,

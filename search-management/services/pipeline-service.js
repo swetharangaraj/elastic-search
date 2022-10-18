@@ -142,12 +142,31 @@ module.exports = {
       let selected_dbs = req.body.data.selectedDbs;
       let index_alias = req.body.data.indexAlias;
       let table = req.body.data.selectedBaseTable;
-      let selected_fields = req.body.data.selectedFields.toString();
+      let selected_fields;
+      if (req.body.data.selectedFields)
+        selected_fields = req.body.data.selectedFields.toString();
       let primary_key_field = req.body.data.primaryKeyField;
       let pipelines = [];
+      let is_custom_query = req.body.data.isCustomQuery;
+      let custom_queries = req.body.data.customQueries;
+      let index_prefix = req.body.data.indexPrefix;
 
       for (let i = 0; i < selected_dbs.length; i++) {
         let implicit_template = template + "";
+        let select_statement =
+          "SELECT [columns],UNIX_TIMESTAMP(changed_on) AS unix_ts_in_secs FROM [table] where (UNIX_TIMESTAMP(changed_on) > :sql_last_value AND changed_on < NOW() AND is_active = 1) order by changed_on ASC";
+        if (is_custom_query == true) {
+          console.log("hi");
+          implicit_template = implicit_template.replace(
+            "[select_statement]",
+            custom_queries[i]
+          );
+        } else
+          implicit_template = implicit_template.replace(
+            "[select_statement]",
+            select_statement
+          );
+
         implicit_template = implicit_template.replace(
           "[mysql_host]",
           config.host
@@ -160,6 +179,7 @@ module.exports = {
           "[mysqlPass]",
           config.password
         );
+
         implicit_template = implicit_template.replace(
           "[database]",
           selected_dbs[i]
@@ -180,15 +200,24 @@ module.exports = {
           "[elastic_password]",
           config.elastic_password
         );
-        implicit_template = implicit_template.replace(
-          "[index_name]",
-          `${table}_${selected_dbs[i]}`
-        );
-        implicit_template = implicit_template.replace("[table]", table);
-        implicit_template = implicit_template.replace(
-          "[columns]",
-          selected_fields
-        );
+
+        if (is_custom_query == true) {
+          implicit_template = implicit_template.replace(
+            "[index_name]",
+            `${index_prefix}_${selected_dbs[i]}`
+          );
+        } else {
+          implicit_template = implicit_template.replace(
+            "[index_name]",
+            `${table}_${selected_dbs[i]}`
+          );
+          implicit_template = implicit_template.replace("[table]", table);
+          implicit_template = implicit_template.replace(
+            "[columns]",
+            selected_fields
+          );
+        }
+
         implicit_template = implicit_template.replace(
           "[primary_key]",
           primary_key_field
@@ -213,10 +242,16 @@ module.exports = {
             "queue.checkpoint.writes": 1024,
           },
         };
-        pipelines.push({
-          pipeline_name: `${table}_${selected_dbs[i]}-pipe`,
-          pipeline_obj: pipelineObj,
-        });
+        if (is_custom_query == true)
+          pipelines.push({
+            pipeline_name: `${index_prefix}_${selected_dbs[i]}-pipe`,
+            pipeline_obj: pipelineObj,
+          });
+        else
+          pipelines.push({
+            pipeline_name: `${table}_${selected_dbs[i]}-pipe`,
+            pipeline_obj: pipelineObj,
+          });
       }
       res.status(200).send({
         err: false,
