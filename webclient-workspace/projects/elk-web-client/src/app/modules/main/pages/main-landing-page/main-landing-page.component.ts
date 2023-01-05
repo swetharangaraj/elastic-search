@@ -8,10 +8,10 @@ import { Component, OnInit } from '@angular/core';
 export class MainLandingPageComponent implements OnInit {
 
   routes:any = [
-    {
-      path:'dashboard',
-      value:'dashboard'
-    },
+    // {
+    //   path:'dashboard',
+    //   value:'dashboard'
+    // },
     {
       path:'searchManagement',
       value:'Search index Management'
