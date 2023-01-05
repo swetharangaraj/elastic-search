@@ -16,10 +16,10 @@ export class MainLandingPageComponent implements OnInit {
       path:'searchManagement',
       value:'Search index Management'
     },
-    {
-      path:'searchIndexCreation',
-      value:'Search Index creation'
-    }
+    // {
+    //   path:'searchIndexCreation',
+    //   value:'Search Index creation'
+    // }
   ]
 
   constructor() { }
