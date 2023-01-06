@@ -58,7 +58,7 @@ mongo_conn_native
     app.use("/api/mongoSync", mongoSync);
     app.use("/api/elastic", elastic);
     app.use("/api/role_mgmt", role_mgmt);
-    app.use("/elastic/api/search", search_client);
+    app.use("/api/search", search_client);
     console.log("mongo connected!");
   })
   .catch((err) => {
