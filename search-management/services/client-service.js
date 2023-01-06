@@ -74,7 +74,7 @@ module.exports = {
     } catch (err) {
       logger.error(err);
       console.error(err);
-      res.status(404).send({
+      res.send({
         err: true,
         message: err,
       });
@@ -221,7 +221,7 @@ module.exports = {
     } catch (err) {
       logger.error(err);
       console.error(err);
-      res.status(404).send({
+      res.send({
         err: true,
         message: err,
       });
@@ -281,7 +281,7 @@ module.exports = {
     } catch (err) {
       logger.error(err);
       console.error(err);
-      res.status(404).send({
+      res.send({
         err: true,
         message: err,
       });
@@ -351,7 +351,7 @@ module.exports = {
     } catch (err) {
       logger.error(err);
       console.error(err);
-      res.status(404).send({
+      res.send({
         err: true,
         message: err,
       });
@@ -382,7 +382,7 @@ module.exports = {
     } catch (err) {
       logger.error(err);
       console.error(err);
-      res.status(404).send({
+      res.send({
         err: true,
         message: err,
       });
@@ -412,7 +412,7 @@ module.exports = {
     } catch (err) {
       logger.error(err);
       console.error(err);
-      res.status(404).send({
+      res.send({
         err: true,
         message: err,
       });
@@ -507,7 +507,7 @@ module.exports = {
     } catch (err) {
       logger.error(err);
       console.error(err);
-      res.status(404).send({
+      res.send({
         err: true,
         message: err,
       });
@@ -538,7 +538,7 @@ module.exports = {
     } catch (err) {
       logger.error(err);
       console.error(err);
-      res.status(404).send({
+      res.send({
         err: true,
         message: err,
       });
@@ -636,7 +636,7 @@ module.exports = {
     } catch (err) {
       logger.error(err);
       console.error(err);
-      res.status(404).send({
+      res.send({
         err: true,
         message: err,
       });
@@ -726,7 +726,7 @@ module.exports = {
     } catch (err) {
       logger.error(err);
       console.error(err);
-      res.status(404).send({
+      res.send({
         err: true,
         message: err,
       });
@@ -766,7 +766,7 @@ module.exports = {
     } catch (err) {
       logger.error(err);
       console.error(err);
-      res.status(404).send({
+      res.send({
         err: true,
         message: err,
       });
@@ -802,7 +802,7 @@ module.exports = {
     } catch (err) {
       logger.error(err);
       console.error(err);
-      res.status(404).send({
+      res.send({
         err: true,
         message: err,
       });
@@ -836,7 +836,7 @@ module.exports = {
     } catch (err) {
       logger.error(err);
       console.error(err);
-      res.status(404).send({
+      res.send({
         err: true,
         message: err,
       });
@@ -876,7 +876,7 @@ module.exports = {
     } catch (err) {
       logger.error(err);
       console.error(err);
-      res.status(404).send({
+      res.send({
         err: true,
         message: err,
       });
