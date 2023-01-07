@@ -58,6 +58,7 @@ module.exports = {
                 index_name: 1,
                 app_name: 1,
                 route_url: 1,
+                auth_filter_api:1
               },
             },
           ])
