@@ -22,6 +22,7 @@ filter{
         copy => { "[primary_key]" => "[@metadata][_id]"}
         remove_field => ["[primary_key]", "@version", "unix_ts_in_secs"]
         add_field => { "index_alias_name" => "[index_alias_name]" }
+        add_field => { "index_name" => "[index_name]" }
     }
 }
 
