@@ -32,6 +32,7 @@ export class MysqlCustomQueryComponent implements OnInit {
   allRoleGroups: any = [];
   autocompleteField = new FormControl();
   routeUrl = new FormControl();
+  authFilterApi = new FormControl();
   indexAlias = new FormControl();
   primaryKeyFieldctrl = new FormControl();
   indexPrefix = new FormControl();
@@ -169,6 +170,7 @@ export class MysqlCustomQueryComponent implements OnInit {
                 app_name: this.indexAlias.value,
                 fetch_method: 'custom_sql_query',
                 route_url: this.routeUrl.value,
+                auth_filter_api: this.authFilterApi.value,
                 index_prefix: this.indexPrefix.value,
                 accessible_roleGroups: this.selectedRoleGroups,
                 generalQuery: this.data[i].generalQuery,
