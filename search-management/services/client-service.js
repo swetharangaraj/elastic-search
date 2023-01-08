@@ -58,7 +58,7 @@ module.exports = {
                 index_name: 1,
                 app_name: 1,
                 route_url: 1,
-                auth_filter_api:1
+                auth_filter_api: 1,
               },
             },
           ])
@@ -94,25 +94,35 @@ module.exports = {
     try {
       let indices = req.body.indices;
       let search_key = req.body.search_key;
+      let auth_filter = req.body.auth_filter;
       const URL = `${config.elastic_url}/${indices.toString()}/_search`;
       const API_KEY = config.elasticApiKey;
 
       let b_params = {
-        // _source: false,
         query: {
-          match_phrase_prefix: {
-            suggestion_any: search_key,
+          bool: {
+            must: [
+              {
+                match_phrase_prefix: {
+                  suggestion_any: search_key,
+                },
+              },
+            ],
+            filter: [
+              {
+                bool: auth_filter,
+              },
+            ],
           },
         },
-        fields: ["index_alias_name", "suggestion_any"],
         highlight: {
           fields: {
-            suggestion_any: {
+            "suggestion_any": {
               pre_tags: ["<strong>"],
               post_tags: ["</strong>"],
-              type: "unified",
             },
           },
+          require_field_match: true,
         },
       };
 
@@ -128,97 +138,70 @@ module.exports = {
       };
 
       let response = await axios(axios_config);
-      let raw_suggestions = response.data.hits.hits;
-      let final = [];
-      for (let i = 0; i < raw_suggestions.length; i++) {
-        if (raw_suggestions[i].highlight) {
-          for (
-            let j = 0;
-            j < raw_suggestions[i].highlight.suggestion_any.length;
-            j++
-          ) {
-            final.push({
-              _index: raw_suggestions[i]._index,
-              index_alias_name: raw_suggestions[i].fields.index_alias_name[0],
-              text: raw_suggestions[i].highlight.suggestion_any[j],
-              detail: raw_suggestions[i]._source,
-            });
-            if (
-              i == raw_suggestions.length - 1 &&
-              j == raw_suggestions[i].highlight.suggestion_any.length - 1
-            ) {
-              let formatted_result = final.filter(function (a) {
-                var key = a._index + "|" + a.text;
-                if (!this[key]) {
-                  this[key] = true;
-                  return true;
-                }
-              }, Object.create(null));
 
-              res.status(200).send({
-                err: false,
-                message: "suggestion retrieved suggessfully",
-                data: formatted_result,
-              });
-            }
-          }
-        } else {
-          final.push({
-            _index: raw_suggestions[i]._index,
-            index_alias_name: raw_suggestions[i].fields.index_alias_name[0],
-            text: raw_suggestions[i].fields.suggestion_any.join(" | "),
-            detail: raw_suggestions[i]._source,
-          });
-
-          if (i == raw_suggestions.length - 1) {
-            let formatted_result = final.filter(function (a) {
-              var key = a._index + "|" + a.text;
-              if (!this[key]) {
-                this[key] = true;
-                return true;
-              }
-            }, Object.create(null));
-
-            res.status(200).send({
-              err: false,
-              message: "suggestion retrieved suggessfully",
-              data: formatted_result,
-            });
-          }
-        }
-      }
-
-      // raw_suggestions.forEach((element) => {
-      //   if (element.highlight) {
-      //     element.highlight.suggestion_any.forEach((suggestion) => {
+      // let raw_suggestions = response.data.hits.hits;
+      // let final = [];
+      // for (let i = 0; i < raw_suggestions.length; i++) {
+      //   if (raw_suggestions[i].highlight) {
+      //     for (
+      //       let j = 0;
+      //       j < raw_suggestions[i].highlight.suggestion_any.length;
+      //       j++
+      //     ) {
       //       final.push({
-      //         _index: element._index,
-      //         index_alias_name: element.fields.index_alias_name[0],
-      //         text: suggestion,
+      //         _index: raw_suggestions[i]._index,
+      //         index_alias_name: raw_suggestions[i].fields.index_alias_name[0],
+      //         text: raw_suggestions[i].highlight.suggestion_any[j],
+      //         detail: raw_suggestions[i]._source,
       //       });
-      //     });
+      //       if (
+      //         i == raw_suggestions.length - 1 &&
+      //         j == raw_suggestions[i].highlight.suggestion_any.length - 1
+      //       ) {
+      //         let formatted_result = final.filter(function (a) {
+      //           var key = a._index + "|" + a.text;
+      //           if (!this[key]) {
+      //             this[key] = true;
+      //             return true;
+      //           }
+      //         }, Object.create(null));
+
+      //         res.status(200).send({
+      //           err: false,
+      //           message: "suggestion retrieved suggessfully",
+      //           data: formatted_result,
+      //         });
+      //       }
+      //     }
       //   } else {
       //     final.push({
-      //       _index: element._index,
-      //       index_alias_name: element.fields.index_alias_name[0],
-      //       text: element.fields.suggestion_any.join(" | "),
+      //       _index: raw_suggestions[i]._index,
+      //       index_alias_name: raw_suggestions[i].fields.index_alias_name[0],
+      //       text: raw_suggestions[i].fields.suggestion_any.join(" | "),
+      //       detail: raw_suggestions[i]._source,
       //     });
-      //   }
-      // });
-      // let formatted_result = final.filter(function (a) {
-      //   var key = a.index + "|" + a.term;
-      //   if (!this[key]) {
-      //     this[key] = true;
-      //     return true;
-      //   }
-      // }, Object.create(null));
 
-      // res.status(200).send({
-      //   err: false,
-      //   message: "suggestion retrieved suggessfully",
-      //   data: formatted_result,
-      //   raw: raw_suggestions,
-      // });
+      //     if (i == raw_suggestions.length - 1) {
+      //       let formatted_result = final.filter(function (a) {
+      //         var key = a._index + "|" + a.text;
+      //         if (!this[key]) {
+      //           this[key] = true;
+      //           return true;
+      //         }
+      //       }, Object.create(null));
+
+      //       res.status(200).send({
+      //         err: false,
+      //         message: "suggestion retrieved suggessfully",
+      //         data: formatted_result,
+      //       });
+      //     }
+      //   }
+      // }
+      res.send({
+        err: false,
+        data: response.data.hits,
+      });
     } catch (err) {
       logger.error(err);
       console.error(err);
