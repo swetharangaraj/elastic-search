@@ -103,8 +103,8 @@ module.exports = {
           bool: {
             must: [
               {
-                match_phrase_prefix: {
-                  suggestion_any: search_key,
+                query_string: {
+                  query: `${search_key}~`,
                 },
               },
             ],
@@ -117,7 +117,7 @@ module.exports = {
         },
         highlight: {
           fields: {
-            "suggestion_any": {
+            "*": {
               pre_tags: ["<strong>"],
               post_tags: ["</strong>"],
             },
