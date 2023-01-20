@@ -36,6 +36,9 @@ services:
         target: /usr/share/logstash/config/logstash.yml
         read_only: true
     restart: on-failure
+    logging:
+      options:
+        max-size: 10m    
 
   search-mgmt-service:
     build:
