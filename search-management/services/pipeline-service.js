@@ -169,15 +169,15 @@ module.exports = {
 
         implicit_template = implicit_template.replace(
           "[mysql_host]",
-          config.host
+          config.rr_host
         );
         implicit_template = implicit_template.replace(
           "[mysqlUser]",
-          config.user
+          config.rr_user
         );
         implicit_template = implicit_template.replace(
           "[mysqlPass]",
-          config.password
+          config.rr_password
         );
 
         implicit_template = implicit_template.replace(
