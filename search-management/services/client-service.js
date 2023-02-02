@@ -5,7 +5,8 @@ const { rpool, pool } = require("../databaseCon");
 const axios = require("axios");
 const config = require("config");
 const bodybuilder = require("bodybuilder");
-const e = require("express");
+const ObjectId = require('mongodb').ObjectId
+
 /**
  * client_service module
  * @module client_service
@@ -727,25 +728,71 @@ module.exports = {
 
   saveRecentSearchEntry: async (req, res) => {
     try {
-      let entry = req.body;
-      if (entry.row_data == null || entry.row_data == undefined) {
-        let row_data_result = await mongo.client
-          .db("elastic_management")
-          .collection("t_index_ui_field_mapping")
-          .findOne({
-            index_name: entry.index_info.index_name,
+
+      let domain = req.body.domain;
+      let user = req.body.user;
+
+      let userData = await mongo.client.db('elastic_management').collection('t_recent_searches').findOne({
+        user: user,
+        domain: domain
+      })
+
+      if (userData) {
+        let indices = userData.indices;
+        let indice_present = _.filter(indices,
+          function (indice) {
+            return indice.index_detail.index_name === req.body.row.index;
           });
-        entry.row_data = row_data_result.fields;
+
+        let indice_index = _.findIndex(indices, function (indice) { return indice.index_detail.index_name === req.body.row.index; })
+
+
+        if (indice_present.length > 0) {
+          let row_data = indices[indice_index].data;
+          let is_row_present_present = _.filter(row_data,
+            function (row) {
+              return row.unique_id === req.body.row.unique_id;
+            });
+
+
+          /**pushing if the row is not already present */
+
+          if (is_row_present_present.length == 0) {
+            indices[indice_index].data.unshift(req.body.row);
+
+          }
+        }
+        else {
+          indices.unshift(req.body.index_detail);
+        }
+
+        // console.log(indices);
+
+        userData.indices = indices;
+
+        let update_result = await mongo.client.db('elastic_management').collection('t_recent_searches').updateOne({
+          _id: ObjectId(userData._id)
+        },
+          { $set: { indices: indices } });
       }
-      entry.timestamp = new Date();
-      let result = await mongo.client
-        .db("elastic_management")
-        .collection("t_recent_searches")
-        .insertOne(entry);
+      else {
+        let entry = {
+          user: user,
+          domain: domain,
+          indices: [
+            {
+              index_detail: req.body.index_detail.index_detail,
+              data: [req.body.row]
+            }
+          ]
+        }
+        let insert_result = await mongo.client.db('elastic_management').collection('t_recent_searches').insertOne(entry);
+      }
+
+
       res.status(200).send({
         err: false,
-        message: "Entry saved successfully",
-        result: result,
+        message: "Entry saved successfully"
       });
     } catch (err) {
       logger.error(err);
@@ -772,12 +819,10 @@ module.exports = {
       let result = await mongo.client
         .db("elastic_management")
         .collection("t_recent_searches")
-        .find({
+        .findOne({
           domain: domain,
           user: user,
         })
-        .sort({ timestamp: -1 })
-        .toArray();
       res.status(200).send({
         err: false,
         message: "recent searches retrieved successfully",
