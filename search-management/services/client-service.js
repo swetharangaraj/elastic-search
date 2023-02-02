@@ -838,6 +838,7 @@ module.exports = {
   getSearchBarRoles: async (req, res) => {
     try {
       let feature_enabled_tenants;
+      let feature_enabled_roles;
       let general_configs = await mongo.client
         .db("elastic_management")
         .collection("m_general_configurations")
@@ -845,6 +846,7 @@ module.exports = {
         .toArray();
       if (general_configs.length > 0) {
         feature_enabled_tenants = general_configs[0].deployed_tenants;
+        feature_enabled_roles = general_configs[0].enabled_roles;
       }
 
       console.log(feature_enabled_tenants);
@@ -854,7 +856,7 @@ module.exports = {
         message: "search bar accessible roleids retrieved",
         data: {
           feature_enabled_tenants: feature_enabled_tenants,
-          roles: [1],
+          roles: feature_enabled_roles,
         },
       });
     } catch (err) {
