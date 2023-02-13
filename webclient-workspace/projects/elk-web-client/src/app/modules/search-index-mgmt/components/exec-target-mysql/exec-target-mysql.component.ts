@@ -40,7 +40,7 @@ export class ExecTargetMysqlComponent implements OnInit {
   /***
    * custom query
    */
-  isCustomQuery: boolean = false;
+  isCustomQuery: boolean = true;
 
   testableQuery!: string;
   finalQuery!: string;
