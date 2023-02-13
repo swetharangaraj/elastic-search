@@ -168,6 +168,7 @@ export class MysqlCustomQueryComponent implements OnInit {
                 executed_on: 'tad',
                 db_name: index.db,
                 app_name: this.indexAlias.value,
+                primary_key_field: this.primaryKeyFieldctrl.value,
                 fetch_method: 'custom_sql_query',
                 route_url: this.routeUrl.value,
                 auth_filter_api: this.authFilterApi.value,

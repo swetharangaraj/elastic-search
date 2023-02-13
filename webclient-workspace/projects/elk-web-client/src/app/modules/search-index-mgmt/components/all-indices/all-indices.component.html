@@ -1,29 +1,36 @@
 <div class="row mt-3">
   <div class="col-12">
     <h4 class="text-red-600 font-bold">Available indices</h4>
-    <button
-      mat-raised-button
-      color="primary"
-      (click)="deleteIndices()"
-      [disabled]="rowData.length == 0"
-    >
+    <button mat-raised-button color="primary" (click)="deleteIndices()" [disabled]="rowData.length == 0">
       Delete indices
     </button>
+    <button mat-raised-button color="primary" style="margin-left: 10px;" [disabled]="rowData.length == 0"
+      (click)="syncForOtherTenants()" cdkOverlayOrigin #trigger="cdkOverlayOrigin">
+      Sync Selected Base indices with all other Tenant indices
+    </button>
+    <button mat-raised-button color="primary" style="margin-left: 10px;" [disabled]="rowData.length == 0"
+    (click)  = "startSyncingPipelines()"
+    >
+    Start Syncing
+  </button>
+    <!-- This template displays the overlay content and is connected to the button -->
+    <ng-template cdkConnectedOverlay [cdkConnectedOverlayOrigin]="trigger" [cdkConnectedOverlayOpen]="isAllTenantsOpen">
+      <div class="all-tenant-popup">
+        <mat-selection-list #shoes [formControl] = "selectedTenants">
+          <mat-list-option *ngFor="let tenant of availableTenants" [value] = "tenant">
+            {{tenant.tenant_name}} | db - {{tenant.tad}}
+          </mat-list-option>
+        </mat-selection-list>
+      </div>
+    </ng-template>
   </div>
 </div>
 
 <div class="row mt-2">
   <div class="col-12">
-    <ag-grid-angular
-      style="height: 500px"
-      class="ag-theme-alpine"
-      [rowData]="rowData"
-      [columnDefs]="columnDefs"
-      [rowSelection]="rowSelection"
-      (selectionChanged)="onSelectionChanged($event)"
-      (gridReady)="onGridReady($event)"
-      [suppressRowClickSelection]="true"
-    >
+    <ag-grid-angular style="height: 500px" class="ag-theme-alpine" [rowData]="rowData" [columnDefs]="columnDefs"
+      [rowSelection]="rowSelection" (selectionChanged)="onSelectionChanged($event)" (gridReady)="onGridReady($event)"
+      [suppressRowClickSelection]="true">
     </ag-grid-angular>
   </div>
 </div>
@@ -36,12 +43,7 @@
 
 <div class="row mt-2">
   <div class="col-12">
-    <ag-grid-angular
-      style="height: 500px"
-      class="ag-theme-alpine"
-      [rowData]="stats"
-      [columnDefs]="columnDefsStats"
-    >
+    <ag-grid-angular style="height: 500px" class="ag-theme-alpine" [rowData]="stats" [columnDefs]="columnDefsStats">
     </ag-grid-angular>
   </div>
 </div>

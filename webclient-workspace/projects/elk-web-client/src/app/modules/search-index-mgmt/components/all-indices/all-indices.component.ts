@@ -1,4 +1,5 @@
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
+import { FormControl } from '@angular/forms';
 import {
   MatDialog,
   MatDialogRef,
@@ -8,6 +9,7 @@ import { ColDef, GridApi, GridReadyEvent } from 'ag-grid-community';
 import { EsManagementService } from 'projects/elk-web-client/src/services/es-management.service';
 import { SocketService } from 'projects/elk-web-client/src/services/socket.service';
 import { pluck } from 'rxjs/operators';
+import * as _ from "underscore";
 @Component({
   selector: 'app-all-indices',
   templateUrl: './all-indices.component.html',
@@ -15,6 +17,7 @@ import { pluck } from 'rxjs/operators';
 })
 export class AllIndicesComponent implements OnInit {
   public rowSelection = 'multiple';
+  availableTenants:any = [];
   columnDefs: ColDef[] = [
     {
       field: 'index_name',
@@ -24,6 +27,7 @@ export class AllIndicesComponent implements OnInit {
     },
     { field: 'database_type', sortable: true, filter: true },
     { field: 'db_name', sortable: true, filter: true },
+    { field: 'index_prefix', sortable: true, filter: true },
     { field: 'table_name', sortable: true, filter: true },
     { field: 'pipeline_type', sortable: true, filter: true },
     { field: 'pipeline_id', sortable: true, filter: true },
@@ -46,12 +50,139 @@ export class AllIndicesComponent implements OnInit {
   rowData: any = [];
   stats: any = [];
   private gridApi!: GridApi;
-  constructor(private _es: EsManagementService, private _dialog: MatDialog) {}
+  isAllTenantsOpen:boolean = false;
+  selectedTenants = new FormControl();
+
+  constructor(private _es: EsManagementService, private _dialog: MatDialog) { }
 
   ngOnInit(): void {
     this.getAllIndices();
     this.getAllIndicesStats();
+    this.getAllTenants();
   }
+
+
+  getAllTenants = () => {
+    this._es.getActiveTenants().pipe(pluck('data')).subscribe({ next: (res: any) => { 
+      this.availableTenants = res;
+     }, error: (err) => { console.error(err); } })
+  }
+
+
+  startSyncingPipelines = () =>{
+
+    if(this.selectedTenants.value.length > 0 && this.selectedRows.length > 0){
+
+     this.selectedRows.forEach((value:any, index:any, array:any) => {
+
+      this.selectedTenants.value.forEach((tenant:any, tenantIndex:any, tenantArray:any) => {
+
+  
+        let selectedDb = tenant.tad;      
+        let indexAlias = value.app_name;
+        let primaryKeyField = value.primary_key_field;
+        let query = value.generalQuery.replaceAll('db_name', selectedDb);
+        let indexPrefix = value.index_prefix;
+        let inputObj = {
+          selectedDbs: [selectedDb],
+          indexAlias: indexAlias,
+          primaryKeyField:primaryKeyField,
+          isCustomQuery: true,
+          customQueries: [query],
+          indexPrefix: indexPrefix,
+        };
+        this._es
+        .generatePipelines(inputObj)
+        .pipe(pluck('data'))
+        .subscribe({
+          next: (res:any) => {
+      
+            let pipeline = res[0];
+
+            /*** index creation */
+            let index = `${indexPrefix}_${selectedDb}`;
+            this._es.createIndex(index,[]).pipe(pluck('data')).subscribe(
+              {
+                next:(res:any) =>{
+                  console.log("created elastic Index", index)
+          
+                  let doc = {
+                    index_name: index,
+                    ingestion_mode: 'database_sync',
+                    database_type: 'mysql',
+                    pipeline_type: 'logstash',
+                    pipeline_id: `${index}-pipe`,
+                    executed_on: 'tad',
+                    db_name: selectedDb,
+                    app_name: indexAlias,
+                    primary_key_field: primaryKeyField,
+                    fetch_method: 'custom_sql_query',
+                    route_url: value.route_url,
+                    auth_filter_api: value.auth_filter_api,
+                    index_prefix: indexPrefix,
+                    accessible_roleGroups: value.accessible_roleGroups,
+                    generalQuery: value.generalQuery,
+                    transformedQuery: query,
+                  }
+                  // console.log(pipeline);
+                  // console.log(doc);
+
+                  this._es.createIndexInMongo(doc).subscribe({
+                    next: (res) => {
+                      console.log("created mongo index", index);
+
+                     this._es.createPipeline(pipeline).subscribe({next:(res:any) =>{
+                      console.log("logstash pipline created", `${index}-pipe`)
+                      console.log("------------------------------------")
+                     }, error:(err) =>{
+                      console.error(err);
+                     }}) 
+
+
+                    },
+                    error: (err) => {
+                      console.error(err);
+                    },
+                  });
+
+                },
+                error:(err) =>{
+                  console.error(err);
+                }
+              }
+            )
+             
+            /***index creation ends */
+
+          },
+          error: (err) => {
+            console.error(err);
+          },
+        });
+
+
+      })
+
+ 
+
+
+     }) 
+      
+
+
+      // this._es.SyncBasePipelineWithTenants(this.selectedRows, this.selectedTenants).subscribe({next:(res:any) =>{
+      //   console.log(res);
+      // },error:(err) =>{
+      //   console.error(err);
+      // }})
+    }
+  }
+
+  getGeneratedPipeLines(){
+
+  }
+
+
 
   getAllIndicesStats() {
     this._es
@@ -97,13 +228,18 @@ export class AllIndicesComponent implements OnInit {
     this.gridApi = params.api;
   }
 
+  syncForOtherTenants() {
+    console.log(this.selectedRows)
+    this.isAllTenantsOpen = true;
+  }
+
   deleteIndices() {
     let logs: any = [];
     let confirmation = window.confirm(
       'Deleting the indices will also delete the pipelines associated with it ! are you sure?'
     );
     if (confirmation) {
-   
+
       this._es.deleteIndices(this.selectedRows).subscribe({
         next: (res) => {
           window.location.reload();

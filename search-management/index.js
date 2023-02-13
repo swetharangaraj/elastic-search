@@ -13,10 +13,10 @@ const logger = require("./logger");
 const mongo_conn_native = require("./mongo_conn_native").Connection;
 const queueCon = require("./mqCon");
 const { error } = require("./logger");
-queueCon.start().then(() => {
-  const delete_index_worker = require("./workers/deleteIndex-worker");
-  const publisher = require("./publisher");
-});
+// queueCon.start().then(() => {
+//   const delete_index_worker = require("./workers/deleteIndex-worker");
+//   const publisher = require("./publisher");
+// });
 
 /**
  * worker initialization

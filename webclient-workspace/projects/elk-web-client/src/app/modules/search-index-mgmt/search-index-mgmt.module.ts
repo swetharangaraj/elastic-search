@@ -27,6 +27,9 @@ import { AgGridModule } from 'ag-grid-angular';
 import { AllPipelinesComponent } from './components/all-pipelines/all-pipelines.component';
 import { RoleMgmtComponent } from './pages/role-mgmt/role-mgmt.component';
 import { MysqlCustomQueryComponent } from './components/mysql-custom-query/mysql-custom-query.component';
+import {OverlayModule} from '@angular/cdk/overlay';
+
+
 @NgModule({
   declarations: [
     SiMgmtHomeComponent,
@@ -60,6 +63,7 @@ import { MysqlCustomQueryComponent } from './components/mysql-custom-query/mysql
     MatDialogModule,
     MatChipsModule,
     MatSelectModule,
+    OverlayModule
   ],
 })
 export class SearchIndexMgmtModule {}

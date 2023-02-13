@@ -102,4 +102,18 @@ router.post("/v1/getMappings", sqlsync_service.getMappings);
  */
  router.post("/v1/testQuery", sqlsync_service.testQuery);
 
+
+
+ /**
+ * Route getActiveTenants
+ * @name post/api/sqlSync/v1/getActiveTenants
+ * @function
+ * @memberof module:routers/sqlSync~sqlSyncRouter
+ * @inner
+ * @param {string} path - Express path
+ * @param {callback} middleware - Express middleware.
+ */
+ router.post("/v1/getActiveTenants", sqlsync_service.getActiveTenants);
+
+
 module.exports = router;

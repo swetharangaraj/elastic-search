@@ -157,4 +157,17 @@ export class EsManagementService {
       query_string: queryString,
     });
   }
+
+  SyncBasePipelineWithTenants = (selected_pipelines:any, tenants:any) =>{
+    return this.$http.post('/api/elastic/v1/SyncBasePipelineWithTenants', {
+      selected_pipelines: selected_pipelines,
+      tenants: tenants
+    });
+  }
+ 
+  getActiveTenants = () =>{
+    return this.$http.post("/api/sqlSync/v1/getActiveTenants",{})
+  }
+
+
 }
