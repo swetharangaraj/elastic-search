@@ -170,4 +170,11 @@ export class EsManagementService {
   }
 
 
+  syncIndexUiMap = (source_index:any, target_index:any) =>{
+    return this.$http.post("/api/elastic/v1/syncIndexUiMap",{
+      source_index:source_index,
+      target_index:target_index
+    })
+  }
+
 }

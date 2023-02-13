@@ -76,4 +76,17 @@ router.get("/v1/getIndexStats", elastic_service.getIndexStats);
  router.delete("/v1/deleteIndices", elastic_service.deleteIndices);
 
 
+
+ /**
+ * Route syncIndexUiMap
+ * @name post/api/elastic/v1/syncIndexUiMap
+ * @function
+ * @memberof module:routers/elastic~elasticRouter
+ * @inner
+ * @param {string} path - Express path
+ * @param {callback} middleware - Express middleware.
+ */
+ router.post("/v1/syncIndexUiMap", elastic_service.syncIndexUiMap);
+
+
 module.exports = router

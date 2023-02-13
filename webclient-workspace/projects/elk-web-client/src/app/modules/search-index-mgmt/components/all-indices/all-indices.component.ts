@@ -17,7 +17,7 @@ import * as _ from "underscore";
 })
 export class AllIndicesComponent implements OnInit {
   public rowSelection = 'multiple';
-  availableTenants:any = [];
+  availableTenants: any = [];
   columnDefs: ColDef[] = [
     {
       field: 'index_name',
@@ -50,7 +50,7 @@ export class AllIndicesComponent implements OnInit {
   rowData: any = [];
   stats: any = [];
   private gridApi!: GridApi;
-  isAllTenantsOpen:boolean = false;
+  isAllTenantsOpen: boolean = false;
   selectedTenants = new FormControl();
 
   constructor(private _es: EsManagementService, private _dialog: MatDialog) { }
@@ -63,117 +63,128 @@ export class AllIndicesComponent implements OnInit {
 
 
   getAllTenants = () => {
-    this._es.getActiveTenants().pipe(pluck('data')).subscribe({ next: (res: any) => { 
-      this.availableTenants = res;
-     }, error: (err) => { console.error(err); } })
+    this._es.getActiveTenants().pipe(pluck('data')).subscribe({
+      next: (res: any) => {
+        this.availableTenants = res;
+      }, error: (err) => { console.error(err); }
+    })
   }
 
 
-  startSyncingPipelines = () =>{
+  startSyncingPipelines = () => {
 
-    if(this.selectedTenants.value.length > 0 && this.selectedRows.length > 0){
+    if (this.selectedTenants.value.length > 0 && this.selectedRows.length > 0) {
 
-     this.selectedRows.forEach((value:any, index:any, array:any) => {
+      this.selectedRows.forEach((value: any, index: any, array: any) => {
 
-      this.selectedTenants.value.forEach((tenant:any, tenantIndex:any, tenantArray:any) => {
+        this.selectedTenants.value.forEach((tenant: any, tenantIndex: any, tenantArray: any) => {
 
-  
-        let selectedDb = tenant.tad;      
-        let indexAlias = value.app_name;
-        let primaryKeyField = value.primary_key_field;
-        let query = value.generalQuery.replaceAll('db_name', selectedDb);
-        let indexPrefix = value.index_prefix;
-        let inputObj = {
-          selectedDbs: [selectedDb],
-          indexAlias: indexAlias,
-          primaryKeyField:primaryKeyField,
-          isCustomQuery: true,
-          customQueries: [query],
-          indexPrefix: indexPrefix,
-        };
-        this._es
-        .generatePipelines(inputObj)
-        .pipe(pluck('data'))
-        .subscribe({
-          next: (res:any) => {
-      
-            let pipeline = res[0];
 
-            /*** index creation */
-            let index = `${indexPrefix}_${selectedDb}`;
-            this._es.createIndex(index,[]).pipe(pluck('data')).subscribe(
-              {
-                next:(res:any) =>{
-                  console.log("created elastic Index", index)
-          
-                  let doc = {
-                    index_name: index,
-                    ingestion_mode: 'database_sync',
-                    database_type: 'mysql',
-                    pipeline_type: 'logstash',
-                    pipeline_id: `${index}-pipe`,
-                    executed_on: 'tad',
-                    db_name: selectedDb,
-                    app_name: indexAlias,
-                    primary_key_field: primaryKeyField,
-                    fetch_method: 'custom_sql_query',
-                    route_url: value.route_url,
-                    auth_filter_api: value.auth_filter_api,
-                    index_prefix: indexPrefix,
-                    accessible_roleGroups: value.accessible_roleGroups,
-                    generalQuery: value.generalQuery,
-                    transformedQuery: query,
-                  }
-                  // console.log(pipeline);
-                  // console.log(doc);
+          let selectedDb = tenant.tad;
+          let indexAlias = value.app_name;
+          let primaryKeyField = value.primary_key_field;
+          let query = value.generalQuery.replaceAll('db_name', selectedDb);
+          let indexPrefix = value.index_prefix;
+          let inputObj = {
+            selectedDbs: [selectedDb],
+            indexAlias: indexAlias,
+            primaryKeyField: primaryKeyField,
+            isCustomQuery: true,
+            customQueries: [query],
+            indexPrefix: indexPrefix,
+          };
+          this._es
+            .generatePipelines(inputObj)
+            .pipe(pluck('data'))
+            .subscribe({
+              next: (res: any) => {
 
-                  this._es.createIndexInMongo(doc).subscribe({
-                    next: (res) => {
-                      console.log("created mongo index", index);
+                let pipeline = res[0];
 
-                     this._es.createPipeline(pipeline).subscribe({next:(res:any) =>{
-                      console.log("logstash pipline created", `${index}-pipe`)
-                      console.log("------------------------------------")
-                    
-                      
-                      
-                    
-                    
-                    
-                    }, error:(err) =>{
-                      console.error(err);
-                     }}) 
+                /*** index creation */
+                let index = `${indexPrefix}_${selectedDb}`;
+                this._es.createIndex(index, []).pipe(pluck('data')).subscribe(
+                  {
+                    next: (res: any) => {
+                      console.log("created elastic Index", index)
 
+                      let doc = {
+                        index_name: index,
+                        ingestion_mode: 'database_sync',
+                        database_type: 'mysql',
+                        pipeline_type: 'logstash',
+                        pipeline_id: `${index}-pipe`,
+                        executed_on: 'tad',
+                        db_name: selectedDb,
+                        app_name: indexAlias,
+                        primary_key_field: primaryKeyField,
+                        fetch_method: 'custom_sql_query',
+                        route_url: value.route_url,
+                        auth_filter_api: value.auth_filter_api,
+                        index_prefix: indexPrefix,
+                        accessible_roleGroups: value.accessible_roleGroups,
+                        generalQuery: value.generalQuery,
+                        transformedQuery: query,
+                      }
+                      // console.log(pipeline);
+                      // console.log(doc);
+
+                      this._es.createIndexInMongo(doc).subscribe({
+                        next: (res) => {
+                          console.log("created mongo index", index);
+
+                          this._es.createPipeline(pipeline).subscribe({
+                            next: (res: any) => {
+                              console.log("logstash pipline created", `${index}-pipe`)
+
+
+                              this._es.syncIndexUiMap(value.index_name, index).subscribe({
+                                next: (res: any) => {
+                                  console.log("Ui mapping created for index", index)
+                                  console.log("------------------------------------")
+                                }, error: (err) => {
+                                  console.error(err);
+                                }
+                              })
+
+
+
+
+                            }, error: (err) => {
+                              console.error(err);
+                            }
+                          })
+
+
+                        },
+                        error: (err) => {
+                          console.error(err);
+                        },
+                      });
 
                     },
                     error: (err) => {
                       console.error(err);
-                    },
-                  });
+                    }
+                  }
+                )
 
-                },
-                error:(err) =>{
-                  console.error(err);
-                }
-              }
-            )
-             
-            /***index creation ends */
+                /***index creation ends */
 
-          },
-          error: (err) => {
-            console.error(err);
-          },
-        });
+              },
+              error: (err) => {
+                console.error(err);
+              },
+            });
+
+
+        })
+
+
 
 
       })
 
- 
-
-
-     }) 
-      
 
 
       // this._es.SyncBasePipelineWithTenants(this.selectedRows, this.selectedTenants).subscribe({next:(res:any) =>{
@@ -184,7 +195,7 @@ export class AllIndicesComponent implements OnInit {
     }
   }
 
-  getGeneratedPipeLines(){
+  getGeneratedPipeLines() {
 
   }
 
