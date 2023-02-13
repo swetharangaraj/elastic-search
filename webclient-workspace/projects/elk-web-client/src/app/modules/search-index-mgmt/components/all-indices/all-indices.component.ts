@@ -134,7 +134,13 @@ export class AllIndicesComponent implements OnInit {
                      this._es.createPipeline(pipeline).subscribe({next:(res:any) =>{
                       console.log("logstash pipline created", `${index}-pipe`)
                       console.log("------------------------------------")
-                     }, error:(err) =>{
+                    
+                      
+                      
+                    
+                    
+                    
+                    }, error:(err) =>{
                       console.error(err);
                      }}) 
 
