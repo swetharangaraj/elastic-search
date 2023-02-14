@@ -10,6 +10,7 @@ import { EsManagementService } from 'projects/elk-web-client/src/services/es-man
 import { SocketService } from 'projects/elk-web-client/src/services/socket.service';
 import { pluck } from 'rxjs/operators';
 import * as _ from "underscore";
+import { EditIndexConfigsComponent } from '../edit-index-configs/edit-index-configs.component';
 @Component({
   selector: 'app-all-indices',
   templateUrl: './all-indices.component.html',
@@ -239,6 +240,19 @@ export class AllIndicesComponent implements OnInit {
 
   onSelectionChanged(event: any) {
     this.selectedRows = this.gridApi.getSelectedRows();
+    if(this.selectedRows.length == 1)
+    this.openEditUiMapAndFilterConfigDialog();
+  }
+
+
+  openEditUiMapAndFilterConfigDialog(){
+    const dialogRef = this._dialog.open(EditIndexConfigsComponent, {
+      data: this.selectedRows[0],
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('The dialog was closed');
+    });
   }
 
   onGridReady(params: GridReadyEvent) {

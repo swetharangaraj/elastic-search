@@ -30,7 +30,7 @@
   <div class="col-12">
     <ag-grid-angular style="height: 500px" class="ag-theme-alpine" [rowData]="rowData" [columnDefs]="columnDefs"
       [rowSelection]="rowSelection" (selectionChanged)="onSelectionChanged($event)" (gridReady)="onGridReady($event)"
-      [suppressRowClickSelection]="true">
+      [suppressRowClickSelection]="false">
     </ag-grid-angular>
   </div>
 </div>

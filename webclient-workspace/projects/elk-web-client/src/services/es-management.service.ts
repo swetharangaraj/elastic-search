@@ -177,4 +177,10 @@ export class EsManagementService {
     })
   }
 
+
+  getIndexConfigs = (index:string) =>{
+    return this.$http.post("/api/elastic/v1/getIndexConfigs",{
+      index:index
+    })
+  }
 }

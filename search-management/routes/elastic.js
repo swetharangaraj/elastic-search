@@ -88,5 +88,17 @@ router.get("/v1/getIndexStats", elastic_service.getIndexStats);
  */
  router.post("/v1/syncIndexUiMap", elastic_service.syncIndexUiMap);
 
+ /**
+ * Route getIndexConfigs
+ * @name post/api/elastic/v1/getIndexConfigs
+ * @function
+ * @memberof module:routers/elastic~elasticRouter
+ * @inner
+ * @param {string} path - Express path
+ * @param {callback} middleware - Express middleware.
+ */
+ router.post("/v1/getIndexConfigs", elastic_service.getIndexConfigs);
+
+
 
 module.exports = router

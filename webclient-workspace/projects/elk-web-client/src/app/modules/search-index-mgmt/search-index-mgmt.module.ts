@@ -28,7 +28,7 @@ import { AllPipelinesComponent } from './components/all-pipelines/all-pipelines.
 import { RoleMgmtComponent } from './pages/role-mgmt/role-mgmt.component';
 import { MysqlCustomQueryComponent } from './components/mysql-custom-query/mysql-custom-query.component';
 import {OverlayModule} from '@angular/cdk/overlay';
-
+import { EditIndexConfigsComponent } from './components/edit-index-configs/edit-index-configs.component';
 
 @NgModule({
   declarations: [
@@ -43,6 +43,7 @@ import {OverlayModule} from '@angular/cdk/overlay';
     AllPipelinesComponent,
     RoleMgmtComponent,
     MysqlCustomQueryComponent,
+    EditIndexConfigsComponent,
   ],
   imports: [
     CommonModule,

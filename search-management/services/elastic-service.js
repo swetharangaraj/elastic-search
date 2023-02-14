@@ -246,26 +246,26 @@ module.exports = {
     }
   },
 
-   /**
-   * deleteIndices
-   * @param  {*} req
-   * @param  {*} res
-   * @author Amal Anush a
-   * @version 1.0
-   */
+  /**
+  * deleteIndices
+  * @param  {*} req
+  * @param  {*} res
+  * @author Amal Anush a
+  * @version 1.0
+  */
 
 
   syncIndexUiMap: async (req, res) => {
     try {
       let source_index = req.body.source_index;
       let target_index = req.body.target_index;
-      let doc  = await mongo.client.db('elastic_management').collection('t_index_ui_field_mapping')
-      .findOne({index_name:source_index});
+      let doc = await mongo.client.db('elastic_management').collection('t_index_ui_field_mapping')
+        .findOne({ index_name: source_index });
 
       doc.index_name = target_index;
       delete doc['_id'];
       let insertion = await mongo.client.db('elastic_management').collection('t_index_ui_field_mapping')
-      .insertOne(doc);
+        .insertOne(doc);
 
       res.send({
         err: false,
@@ -280,4 +280,36 @@ module.exports = {
       });
     }
   },
+
+
+  getIndexConfigs: async (req, res) => {
+    try {
+      let index = req.body.index;
+      let index_ui_mapping = await mongo.client.db('elastic_management').collection('t_index_ui_field_mapping').findOne({
+        index_name: index
+      })
+
+      let t_filter_response_types = await mongo.client.db('elastic_management').collection('t_filter_response_types').find({
+        index: index
+      }).toArray();
+
+      let config = {
+        index_ui_mapping: index_ui_mapping,
+        t_filter_response_types: t_filter_response_types
+      }
+
+      res.send({
+        err: false,
+        message: "ui map sync successfull",
+        data: config
+      });
+    } catch (err) {
+      console.log(err);
+      logger.error(err);
+      res.status(500).send({
+        err: true,
+        message: err,
+      });
+    }
+  }
 };
