@@ -29,6 +29,7 @@ import { RoleMgmtComponent } from './pages/role-mgmt/role-mgmt.component';
 import { MysqlCustomQueryComponent } from './components/mysql-custom-query/mysql-custom-query.component';
 import {OverlayModule} from '@angular/cdk/overlay';
 import { EditIndexConfigsComponent } from './components/edit-index-configs/edit-index-configs.component';
+import { NgJsonEditorModule } from 'ang-jsoneditor'; 
 
 @NgModule({
   declarations: [
@@ -64,7 +65,8 @@ import { EditIndexConfigsComponent } from './components/edit-index-configs/edit-
     MatDialogModule,
     MatChipsModule,
     MatSelectModule,
-    OverlayModule
+    OverlayModule,
+    NgJsonEditorModule
   ],
 })
 export class SearchIndexMgmtModule {}
