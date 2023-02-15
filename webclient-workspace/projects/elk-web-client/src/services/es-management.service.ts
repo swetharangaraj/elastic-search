@@ -191,4 +191,12 @@ export class EsManagementService {
       fields:fields
     })
   }
+
+
+  updateIndexRole = (roles:any,index_id:any) =>{
+    return this.$http.post("/api/elastic/v1/updateIndexRole",{
+      roles:roles,
+      index_id:index_id,
+    })
+  }
 }

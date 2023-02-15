@@ -111,5 +111,16 @@ router.get("/v1/getIndexStats", elastic_service.getIndexStats);
  */
  router.post("/v1/updateUiMapping", elastic_service.updateUiMapping);
 
+ /**
+ * Route updateIndexRole
+ * @name post/api/elastic/v1/updateIndexRole
+ * @function
+ * @memberof module:routers/elastic~elasticRouter
+ * @inner
+ * @param {string} path - Express path
+ * @param {callback} middleware - Express middleware.
+ */
+ router.post("/v1/updateIndexRole", elastic_service.updateIndexRole);
 
+ 
 module.exports = router

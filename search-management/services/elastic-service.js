@@ -265,8 +265,13 @@ module.exports = {
 
       doc.index_name = target_index;
       delete doc['_id'];
-      let insertion = await mongo.client.db('elastic_management').collection('t_index_ui_field_mapping')
-        .insertOne(doc);
+      // let insertion = await mongo.client.db('elastic_management').collection('t_index_ui_field_mapping')
+      //   .insertOne(doc);
+      const query = { index_name: target_index };
+      const update = { $set: doc };
+      const options = { upsert: true };
+      let update_result = await mongo.client.db('elastic_management').collection('t_index_ui_field_mapping').updateOne(query, update, options);
+
 
       res.send({
         err: false,
@@ -328,6 +333,35 @@ module.exports = {
       res.send({
         err: false,
         message: "ui map update successfull",
+        data: update_result
+      });
+
+    }
+    catch (err) {
+      console.log(err);
+      logger.error(err);
+      res.status(500).send({
+        err: true,
+        message: err,
+      });
+    }
+  },
+
+
+  updateIndexRole: async (req, res) => {
+    try {
+      let roles = req.body.roles;
+      let index_id = req.body.index_id;
+
+      let update_result = await mongo.client.db('elastic_management').collection('t_indices').updateOne(
+        { _id: ObjectId(index_id) },
+        {
+          $set: { accessible_roleGroups: roles }
+        }
+      )
+      res.send({
+        err: false,
+        message: "role update successfull",
         data: update_result
       });
 
