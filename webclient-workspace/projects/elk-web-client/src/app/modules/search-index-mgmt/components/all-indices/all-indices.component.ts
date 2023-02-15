@@ -11,6 +11,8 @@ import { SocketService } from 'projects/elk-web-client/src/services/socket.servi
 import { pluck } from 'rxjs/operators';
 import * as _ from "underscore";
 import { EditIndexConfigsComponent } from '../edit-index-configs/edit-index-configs.component';
+import {MatSnackBar, MatSnackBarModule} from '@angular/material/snack-bar';
+
 @Component({
   selector: 'app-all-indices',
   templateUrl: './all-indices.component.html',
@@ -54,12 +56,17 @@ export class AllIndicesComponent implements OnInit {
   isAllTenantsOpen: boolean = false;
   selectedTenants = new FormControl();
 
-  constructor(private _es: EsManagementService, private _dialog: MatDialog) { }
+  constructor(private _es: EsManagementService, private _dialog: MatDialog, private _snackBar: MatSnackBar) { }
 
   ngOnInit(): void {
     this.getAllIndices();
     this.getAllIndicesStats();
     this.getAllTenants();
+  }
+
+
+  openSnackBar(message: string, action: string) {
+    this._snackBar.open(message, action,{duration:2000});
   }
 
 
@@ -274,7 +281,7 @@ export class AllIndicesComponent implements OnInit {
 
       this._es.deleteIndices(this.selectedRows).subscribe({
         next: (res) => {
-          window.location.reload();
+            this._snackBar.open("Delete Request has been made!", "dismiss")
           // this._dialog.open(IndexDeletionLogsComponent, {
           //   disableClose: true,
           // });
