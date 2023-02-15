@@ -1,14 +1,12 @@
-:host ::ng-deep json-editor,
-:host ::ng-deep json-editor .jsoneditor,
-:host ::ng-deep json-editor > div,
-:host ::ng-deep json-editor jsoneditor-outer {
-    height: 34rem;
-    width: 38rem;
-}
 
 
 .update-btn{
     height: 38px;
     background: gray;
     color: white;
+}
+
+textarea{
+    height: 32rem;
+    width: 48rem;
 }

@@ -183,4 +183,12 @@ export class EsManagementService {
       index:index
     })
   }
+
+  updateUiMap = (id:any,index:any,fields:any) =>{
+    return this.$http.post("/api/elastic/v1/updateUiMapping",{
+      index:index,
+      id:id,
+      fields:fields
+    })
+  }
 }

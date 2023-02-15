@@ -1,8 +1,6 @@
 import { Component, OnInit, Inject, ViewChild } from '@angular/core';
 import {MatDialog, MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import { EsManagementService } from 'projects/elk-web-client/src/services/es-management.service';
-import { JsonEditorComponent, JsonEditorOptions } from 'ang-jsoneditor';
-import { schema } from './schema.value';
 import { pluck } from 'rxjs/operators';
 
 
@@ -14,10 +12,9 @@ import { pluck } from 'rxjs/operators';
 export class EditIndexConfigsComponent implements OnInit {
 
   filterConfig!:any;
-  
-  @ViewChild(JsonEditorComponent) 
-  editor!: JsonEditorComponent;
-options = new JsonEditorOptions(); 
+  indexUiMapping!:any;
+
+
 
 indexConfig:any = {}
 
@@ -26,18 +23,16 @@ indexConfig:any = {}
     @Inject(MAT_DIALOG_DATA) public data: any,
     private _es: EsManagementService
 
-  ) { 
-    this.options.mode = 'code';
-    this.options.modes = ['code', 'text', 'tree', 'view'];
-    this.options.schema = schema;
-    this.options.statusBar = false;
-    this.options.onChange = () => console.log(this.editor.get());
-   
+  ) {    
    }
 
   async ngOnInit(): Promise<void> {
     this.indexConfig  = await this.getIndexConfig();
+    this.indexUiMapping = JSON.stringify(this.indexConfig.index_ui_mapping?.fields, null, 2);
   }
+
+  
+  
 
   getIndexConfig = () =>{
     return new Promise((resolve, reject) =>{
@@ -51,10 +46,20 @@ indexConfig:any = {}
   }
 
   updateUiMapping = () =>{
+    console.log(JSON.parse(this.indexUiMapping))
 
+    this._es.updateUiMap(this.indexConfig.index_ui_mapping._id, this.data.index_name, JSON.parse(this.indexUiMapping)).subscribe({
+      next:(res:any) =>{
+        console.log(res);
+        window.location.reload();
+      },
+      error:(err:any) =>{
+        console.error(err);
+      }
+    })
   }
 
   updateFilterConfig = () =>{
-    
+   
   }
 }

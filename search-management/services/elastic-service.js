@@ -2,6 +2,7 @@ const logger = require("../logger");
 const mongo = require("../mongo_conn_native").Connection;
 const axios = require("axios");
 const config = require("config");
+const ObjectId = require('mongodb').ObjectId
 
 /**
  * elastic search module
@@ -304,6 +305,34 @@ module.exports = {
         data: config
       });
     } catch (err) {
+      console.log(err);
+      logger.error(err);
+      res.status(500).send({
+        err: true,
+        message: err,
+      });
+    }
+  },
+
+  updateUiMapping: async (req, res) => {
+    try {
+      let id = req.body.id;
+      let index = req.body.index;
+      let fields = req.body.fields
+
+      const query = { _id: ObjectId(id) };
+      const update = { $set: { index_name: index, fields: fields } };
+      const options = { upsert: true };
+      let update_result = await mongo.client.db('elastic_management').collection('t_index_ui_field_mapping').updateOne(query, update, options);
+
+      res.send({
+        err: false,
+        message: "ui map update successfull",
+        data: update_result
+      });
+
+    }
+    catch (err) {
       console.log(err);
       logger.error(err);
       res.status(500).send({
