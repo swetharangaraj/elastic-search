@@ -1,8 +1,8 @@
 apiVersion: ambassador/v1
 kind: Mapping
 name: elastic_mapping
-prefix: /elastic
-rewrite: /elastic
+prefix: api/elastic
+rewrite: api/elastic
 service: search-mgmt-service:6600
 timeout_ms: 60000
 idle_timeout_ms: 120000
