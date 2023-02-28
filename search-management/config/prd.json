@@ -10,11 +10,12 @@
   "debug": "false",
   "timezone": "UTC+0",
   "ssl": false,
-  "mongo_conn_str": "mongodb+srv://kebs:kebs123@dev.pkaby.mongodb.net",
-  "elastic_url":"https://da4c006943d9463aa4a4e812273a399a.us-east-1.aws.found.io:9243",
-  "elasticApiKey": "WWV4aXM0QUJPWnAyT3diU09lVHI6M3NiUl9pZUZRYldCWFFIYnBmd0R1dw==",
-  "elastic_cloud_id":"kebs-dev:dXMtZWFzdC0xLmF3cy5mb3VuZC5pbyRkYTRjMDA2OTQzZDk0NjNhYTRhNGU4MTIyNzNhMzk5YSQ0YjUxMTM5MWE5ODU0MTBiYmJjNGRkOTAwOTIwYWMxNQ==",
-  "elastic_user":"elastic",
-  "elastic_password":"s00oi2d6SoMmh2v5MYS2d4bb",
-  "rabbit_mq_str": "amqps://devmtadmin:YkOlicg^uH$z@b-a9b07ac9-a914-4104-a496-7f8110212539.mq.us-east-1.amazonaws.com:5671"
+  "mongo_conn_str": "mongodb+srv://kebsmt:kebsmt@kebs-mt.mjvpu.mongodb.net",
+  "elastic_url": "https://kebs-prd.es.us-east-1.aws.found.io:9243",
+  "elasticApiKey": "MkYzLWlJTUIzNzFYNC1ieHFSbzY6cnI5SmlZaU5SSGFmQXY5QUJuUWx2QQ==",
+  "elastic_cloud_id": "kebs-prd:dXMtZWFzdC0xLmF3cy5mb3VuZC5pbzo0NDMkODJmMTE0Yzg2MzVhNGY3Mjg3NmY3MTQ4ZDA2NWQzODgkOGYxNDVmMjZlZmNhNDFmNGFiOWE3NTFkOWE2OGJjYjE=",
+  "elastic_user": "elastic",
+  "elastic_password": "3vPaqWVBAeLOu8aUeTY7WdFA",
+  "rabbit_mq_str": "amqps://mtadmin:!vLuP5wL^FXt@b-1ce815ed-7612-4e28-955c-b9e29263752f.mq.us-east-1.amazonaws.com:5671"
 }
+
