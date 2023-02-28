@@ -5,7 +5,8 @@ const { rpool, pool } = require("../databaseCon");
 const axios = require("axios");
 const config = require("config");
 const bodybuilder = require("bodybuilder");
-const e = require("express");
+const ObjectId = require('mongodb').ObjectId
+
 /**
  * client_service module
  * @module client_service
@@ -58,6 +59,7 @@ module.exports = {
                 index_name: 1,
                 app_name: 1,
                 route_url: 1,
+                auth_filter_api: 1,
               },
             },
           ])
@@ -74,7 +76,7 @@ module.exports = {
     } catch (err) {
       logger.error(err);
       console.error(err);
-      res.status(404).send({
+      res.send({
         err: true,
         message: err,
       });
@@ -93,25 +95,35 @@ module.exports = {
     try {
       let indices = req.body.indices;
       let search_key = req.body.search_key;
+      let auth_filter = req.body.auth_filter;
       const URL = `${config.elastic_url}/${indices.toString()}/_search`;
       const API_KEY = config.elasticApiKey;
 
       let b_params = {
-        // _source: false,
         query: {
-          match_phrase_prefix: {
-            suggestion_any: search_key,
+          bool: {
+            must: [
+              {
+                query_string: {
+                  query: `${search_key}~`,
+                },
+              },
+            ],
+            filter: [
+              {
+                bool: auth_filter,
+              },
+            ],
           },
         },
-        fields: ["index_alias_name", "suggestion_any"],
         highlight: {
           fields: {
-            suggestion_any: {
+            "*": {
               pre_tags: ["<strong>"],
               post_tags: ["</strong>"],
-              type: "unified",
             },
           },
+          require_field_match: true,
         },
       };
 
@@ -127,101 +139,74 @@ module.exports = {
       };
 
       let response = await axios(axios_config);
-      let raw_suggestions = response.data.hits.hits;
-      let final = [];
-      for (let i = 0; i < raw_suggestions.length; i++) {
-        if (raw_suggestions[i].highlight) {
-          for (
-            let j = 0;
-            j < raw_suggestions[i].highlight.suggestion_any.length;
-            j++
-          ) {
-            final.push({
-              _index: raw_suggestions[i]._index,
-              index_alias_name: raw_suggestions[i].fields.index_alias_name[0],
-              text: raw_suggestions[i].highlight.suggestion_any[j],
-              detail: raw_suggestions[i]._source,
-            });
-            if (
-              i == raw_suggestions.length - 1 &&
-              j == raw_suggestions[i].highlight.suggestion_any.length - 1
-            ) {
-              let formatted_result = final.filter(function (a) {
-                var key = a._index + "|" + a.text;
-                if (!this[key]) {
-                  this[key] = true;
-                  return true;
-                }
-              }, Object.create(null));
 
-              res.status(200).send({
-                err: false,
-                message: "suggestion retrieved suggessfully",
-                data: formatted_result,
-              });
-            }
-          }
-        } else {
-          final.push({
-            _index: raw_suggestions[i]._index,
-            index_alias_name: raw_suggestions[i].fields.index_alias_name[0],
-            text: raw_suggestions[i].fields.suggestion_any.join(" | "),
-            detail: raw_suggestions[i]._source,
-          });
-
-          if (i == raw_suggestions.length - 1) {
-            let formatted_result = final.filter(function (a) {
-              var key = a._index + "|" + a.text;
-              if (!this[key]) {
-                this[key] = true;
-                return true;
-              }
-            }, Object.create(null));
-
-            res.status(200).send({
-              err: false,
-              message: "suggestion retrieved suggessfully",
-              data: formatted_result,
-            });
-          }
-        }
-      }
-
-      // raw_suggestions.forEach((element) => {
-      //   if (element.highlight) {
-      //     element.highlight.suggestion_any.forEach((suggestion) => {
+      // let raw_suggestions = response.data.hits.hits;
+      // let final = [];
+      // for (let i = 0; i < raw_suggestions.length; i++) {
+      //   if (raw_suggestions[i].highlight) {
+      //     for (
+      //       let j = 0;
+      //       j < raw_suggestions[i].highlight.suggestion_any.length;
+      //       j++
+      //     ) {
       //       final.push({
-      //         _index: element._index,
-      //         index_alias_name: element.fields.index_alias_name[0],
-      //         text: suggestion,
+      //         _index: raw_suggestions[i]._index,
+      //         index_alias_name: raw_suggestions[i].fields.index_alias_name[0],
+      //         text: raw_suggestions[i].highlight.suggestion_any[j],
+      //         detail: raw_suggestions[i]._source,
       //       });
-      //     });
+      //       if (
+      //         i == raw_suggestions.length - 1 &&
+      //         j == raw_suggestions[i].highlight.suggestion_any.length - 1
+      //       ) {
+      //         let formatted_result = final.filter(function (a) {
+      //           var key = a._index + "|" + a.text;
+      //           if (!this[key]) {
+      //             this[key] = true;
+      //             return true;
+      //           }
+      //         }, Object.create(null));
+
+      //         res.status(200).send({
+      //           err: false,
+      //           message: "suggestion retrieved suggessfully",
+      //           data: formatted_result,
+      //         });
+      //       }
+      //     }
       //   } else {
       //     final.push({
-      //       _index: element._index,
-      //       index_alias_name: element.fields.index_alias_name[0],
-      //       text: element.fields.suggestion_any.join(" | "),
+      //       _index: raw_suggestions[i]._index,
+      //       index_alias_name: raw_suggestions[i].fields.index_alias_name[0],
+      //       text: raw_suggestions[i].fields.suggestion_any.join(" | "),
+      //       detail: raw_suggestions[i]._source,
       //     });
-      //   }
-      // });
-      // let formatted_result = final.filter(function (a) {
-      //   var key = a.index + "|" + a.term;
-      //   if (!this[key]) {
-      //     this[key] = true;
-      //     return true;
-      //   }
-      // }, Object.create(null));
 
-      // res.status(200).send({
-      //   err: false,
-      //   message: "suggestion retrieved suggessfully",
-      //   data: formatted_result,
-      //   raw: raw_suggestions,
-      // });
+      //     if (i == raw_suggestions.length - 1) {
+      //       let formatted_result = final.filter(function (a) {
+      //         var key = a._index + "|" + a.text;
+      //         if (!this[key]) {
+      //           this[key] = true;
+      //           return true;
+      //         }
+      //       }, Object.create(null));
+
+      //       res.status(200).send({
+      //         err: false,
+      //         message: "suggestion retrieved suggessfully",
+      //         data: formatted_result,
+      //       });
+      //     }
+      //   }
+      // }
+      res.send({
+        err: false,
+        data: response.data.hits,
+      });
     } catch (err) {
       logger.error(err);
       console.error(err);
-      res.status(404).send({
+      res.send({
         err: true,
         message: err,
       });
@@ -281,7 +266,7 @@ module.exports = {
     } catch (err) {
       logger.error(err);
       console.error(err);
-      res.status(404).send({
+      res.send({
         err: true,
         message: err,
       });
@@ -351,7 +336,7 @@ module.exports = {
     } catch (err) {
       logger.error(err);
       console.error(err);
-      res.status(404).send({
+      res.send({
         err: true,
         message: err,
       });
@@ -382,7 +367,7 @@ module.exports = {
     } catch (err) {
       logger.error(err);
       console.error(err);
-      res.status(404).send({
+      res.send({
         err: true,
         message: err,
       });
@@ -412,7 +397,7 @@ module.exports = {
     } catch (err) {
       logger.error(err);
       console.error(err);
-      res.status(404).send({
+      res.send({
         err: true,
         message: err,
       });
@@ -507,7 +492,7 @@ module.exports = {
     } catch (err) {
       logger.error(err);
       console.error(err);
-      res.status(404).send({
+      res.send({
         err: true,
         message: err,
       });
@@ -538,7 +523,7 @@ module.exports = {
     } catch (err) {
       logger.error(err);
       console.error(err);
-      res.status(404).send({
+      res.send({
         err: true,
         message: err,
       });
@@ -636,7 +621,7 @@ module.exports = {
     } catch (err) {
       logger.error(err);
       console.error(err);
-      res.status(404).send({
+      res.send({
         err: true,
         message: err,
       });
@@ -726,7 +711,7 @@ module.exports = {
     } catch (err) {
       logger.error(err);
       console.error(err);
-      res.status(404).send({
+      res.send({
         err: true,
         message: err,
       });
@@ -743,30 +728,76 @@ module.exports = {
 
   saveRecentSearchEntry: async (req, res) => {
     try {
-      let entry = req.body;
-      if (entry.row_data == null || entry.row_data == undefined) {
-        let row_data_result = await mongo.client
-          .db("elastic_management")
-          .collection("t_index_ui_field_mapping")
-          .findOne({
-            index_name: entry.index_info.index_name,
+
+      let domain = req.body.domain;
+      let user = req.body.user;
+
+      let userData = await mongo.client.db('elastic_management').collection('t_recent_searches').findOne({
+        user: user,
+        domain: domain
+      })
+
+      if (userData) {
+        let indices = userData.indices;
+        let indice_present = _.filter(indices,
+          function (indice) {
+            return indice.index_detail.index_name === req.body.row.index;
           });
-        entry.row_data = row_data_result.fields;
+
+        let indice_index = _.findIndex(indices, function (indice) { return indice.index_detail.index_name === req.body.row.index; })
+
+
+        if (indice_present.length > 0) {
+          let row_data = indices[indice_index].data;
+          let is_row_present_present = _.filter(row_data,
+            function (row) {
+              return row.unique_id === req.body.row.unique_id;
+            });
+
+
+          /**pushing if the row is not already present */
+
+          if (is_row_present_present.length == 0) {
+            indices[indice_index].data.unshift(req.body.row);
+
+          }
+        }
+        else {
+          indices.unshift(req.body.index_detail);
+        }
+
+        // console.log(indices);
+
+        userData.indices = indices;
+
+        let update_result = await mongo.client.db('elastic_management').collection('t_recent_searches').updateOne({
+          _id: ObjectId(userData._id)
+        },
+          { $set: { indices: indices } });
       }
-      entry.timestamp = new Date();
-      let result = await mongo.client
-        .db("elastic_management")
-        .collection("t_recent_searches")
-        .insertOne(entry);
+      else {
+        let entry = {
+          user: user,
+          domain: domain,
+          indices: [
+            {
+              index_detail: req.body.index_detail.index_detail,
+              data: [req.body.row]
+            }
+          ]
+        }
+        let insert_result = await mongo.client.db('elastic_management').collection('t_recent_searches').insertOne(entry);
+      }
+
+
       res.status(200).send({
         err: false,
-        message: "Entry saved successfully",
-        result: result,
+        message: "Entry saved successfully"
       });
     } catch (err) {
       logger.error(err);
       console.error(err);
-      res.status(404).send({
+      res.send({
         err: true,
         message: err,
       });
@@ -788,12 +819,10 @@ module.exports = {
       let result = await mongo.client
         .db("elastic_management")
         .collection("t_recent_searches")
-        .find({
+        .findOne({
           domain: domain,
           user: user,
         })
-        .sort({ timestamp: -1 })
-        .toArray();
       res.status(200).send({
         err: false,
         message: "recent searches retrieved successfully",
@@ -802,7 +831,7 @@ module.exports = {
     } catch (err) {
       logger.error(err);
       console.error(err);
-      res.status(404).send({
+      res.send({
         err: true,
         message: err,
       });
@@ -836,7 +865,7 @@ module.exports = {
     } catch (err) {
       logger.error(err);
       console.error(err);
-      res.status(404).send({
+      res.send({
         err: true,
         message: err,
       });
@@ -854,6 +883,7 @@ module.exports = {
   getSearchBarRoles: async (req, res) => {
     try {
       let feature_enabled_tenants;
+      let feature_enabled_roles;
       let general_configs = await mongo.client
         .db("elastic_management")
         .collection("m_general_configurations")
@@ -861,6 +891,7 @@ module.exports = {
         .toArray();
       if (general_configs.length > 0) {
         feature_enabled_tenants = general_configs[0].deployed_tenants;
+        feature_enabled_roles = general_configs[0].enabled_roles;
       }
 
       console.log(feature_enabled_tenants);
@@ -870,13 +901,13 @@ module.exports = {
         message: "search bar accessible roleids retrieved",
         data: {
           feature_enabled_tenants: feature_enabled_tenants,
-          roles: [1],
+          roles: feature_enabled_roles,
         },
       });
     } catch (err) {
       logger.error(err);
       console.error(err);
-      res.status(404).send({
+      res.send({
         err: true,
         message: err,
       });

@@ -76,4 +76,51 @@ router.get("/v1/getIndexStats", elastic_service.getIndexStats);
  router.delete("/v1/deleteIndices", elastic_service.deleteIndices);
 
 
+
+ /**
+ * Route syncIndexUiMap
+ * @name post/api/elastic/v1/syncIndexUiMap
+ * @function
+ * @memberof module:routers/elastic~elasticRouter
+ * @inner
+ * @param {string} path - Express path
+ * @param {callback} middleware - Express middleware.
+ */
+ router.post("/v1/syncIndexUiMap", elastic_service.syncIndexUiMap);
+
+ /**
+ * Route getIndexConfigs
+ * @name post/api/elastic/v1/getIndexConfigs
+ * @function
+ * @memberof module:routers/elastic~elasticRouter
+ * @inner
+ * @param {string} path - Express path
+ * @param {callback} middleware - Express middleware.
+ */
+ router.post("/v1/getIndexConfigs", elastic_service.getIndexConfigs);
+
+
+ /**
+ * Route updateUiMapping
+ * @name post/api/elastic/v1/updateUiMapping
+ * @function
+ * @memberof module:routers/elastic~elasticRouter
+ * @inner
+ * @param {string} path - Express path
+ * @param {callback} middleware - Express middleware.
+ */
+ router.post("/v1/updateUiMapping", elastic_service.updateUiMapping);
+
+ /**
+ * Route updateIndexRole
+ * @name post/api/elastic/v1/updateIndexRole
+ * @function
+ * @memberof module:routers/elastic~elasticRouter
+ * @inner
+ * @param {string} path - Express path
+ * @param {callback} middleware - Express middleware.
+ */
+ router.post("/v1/updateIndexRole", elastic_service.updateIndexRole);
+
+ 
 module.exports = router

@@ -437,3 +437,33 @@ module.exports.testQuery = async (req, res) => {
     });
   }
 };
+
+
+
+/**
+ * showDatabases
+ * @param  {*} req
+ * @param  {*} res
+ * @author Amal Anush a
+ * @version 1.0
+ */
+
+module.exports.getActiveTenants = async (req, res) => {
+  try {
+   
+    let active_tenants = await getAllActiveTenantDbs();
+
+    res.status(200).send({
+      err: false,
+      message: "success",
+      data:active_tenants
+    });
+  } catch (err) {
+    console.error(err);
+    logger.error(err);
+    res.status(501).send({
+      err: true,
+      message: err,
+    });
+  }
+};

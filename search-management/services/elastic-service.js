@@ -2,6 +2,7 @@ const logger = require("../logger");
 const mongo = require("../mongo_conn_native").Connection;
 const axios = require("axios");
 const config = require("config");
+const ObjectId = require('mongodb').ObjectId
 
 /**
  * elastic search module
@@ -245,4 +246,133 @@ module.exports = {
       });
     }
   },
+
+  /**
+  * deleteIndices
+  * @param  {*} req
+  * @param  {*} res
+  * @author Amal Anush a
+  * @version 1.0
+  */
+
+
+  syncIndexUiMap: async (req, res) => {
+    try {
+      let source_index = req.body.source_index;
+      let target_index = req.body.target_index;
+      let doc = await mongo.client.db('elastic_management').collection('t_index_ui_field_mapping')
+        .findOne({ index_name: source_index });
+
+      doc.index_name = target_index;
+      delete doc['_id'];
+      // let insertion = await mongo.client.db('elastic_management').collection('t_index_ui_field_mapping')
+      //   .insertOne(doc);
+      const query = { index_name: target_index };
+      const update = { $set: doc };
+      const options = { upsert: true };
+      let update_result = await mongo.client.db('elastic_management').collection('t_index_ui_field_mapping').updateOne(query, update, options);
+
+
+      res.send({
+        err: false,
+        message: "ui map sync successfull",
+      });
+    } catch (err) {
+      console.log(err);
+      logger.error(err);
+      res.status(500).send({
+        err: true,
+        message: err,
+      });
+    }
+  },
+
+
+  getIndexConfigs: async (req, res) => {
+    try {
+      let index = req.body.index;
+      let index_ui_mapping = await mongo.client.db('elastic_management').collection('t_index_ui_field_mapping').findOne({
+        index_name: index
+      })
+
+      let t_filter_response_types = await mongo.client.db('elastic_management').collection('t_filter_response_types').find({
+        index: index
+      }).toArray();
+
+      let config = {
+        index_ui_mapping: index_ui_mapping,
+        t_filter_response_types: t_filter_response_types
+      }
+
+      res.send({
+        err: false,
+        message: "ui map sync successfull",
+        data: config
+      });
+    } catch (err) {
+      console.log(err);
+      logger.error(err);
+      res.status(500).send({
+        err: true,
+        message: err,
+      });
+    }
+  },
+
+  updateUiMapping: async (req, res) => {
+    try {
+      let id = req.body.id;
+      let index = req.body.index;
+      let fields = req.body.fields
+
+      const query = { _id: ObjectId(id) };
+      const update = { $set: { index_name: index, fields: fields } };
+      const options = { upsert: true };
+      let update_result = await mongo.client.db('elastic_management').collection('t_index_ui_field_mapping').updateOne(query, update, options);
+
+      res.send({
+        err: false,
+        message: "ui map update successfull",
+        data: update_result
+      });
+
+    }
+    catch (err) {
+      console.log(err);
+      logger.error(err);
+      res.status(500).send({
+        err: true,
+        message: err,
+      });
+    }
+  },
+
+
+  updateIndexRole: async (req, res) => {
+    try {
+      let roles = req.body.roles;
+      let index_id = req.body.index_id;
+
+      let update_result = await mongo.client.db('elastic_management').collection('t_indices').updateOne(
+        { _id: ObjectId(index_id) },
+        {
+          $set: { accessible_roleGroups: roles }
+        }
+      )
+      res.send({
+        err: false,
+        message: "role update successfull",
+        data: update_result
+      });
+
+    }
+    catch (err) {
+      console.log(err);
+      logger.error(err);
+      res.status(500).send({
+        err: true,
+        message: err,
+      });
+    }
+  }
 };

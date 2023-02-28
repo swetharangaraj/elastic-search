@@ -1,0 +1,60 @@
+<mat-tab-group>
+    <mat-tab label="Ui mapping">
+        <div class="row">
+            <button class="update-btn" (click) = "updateUiMapping()">Update UI mapping</button>
+        </div>
+        <!-- <json-editor [options]='options' [data]='indexConfig.index_ui_mapping?.fields'></json-editor> -->
+        <textarea name="" id="" cols="30" rows="10" [(ngModel)]="indexUiMapping"></textarea>
+    </mat-tab>
+
+      <mat-tab label="Role groups"> 
+        <div class="row">
+            <mat-form-field class="example-chip-list" appearance="fill">
+                <mat-label>Role groups</mat-label>
+                <mat-chip-list #chipList>
+                  <mat-chip
+                    *ngFor="let role of selectedRoleGroups; let i = index"
+                    (removed)="remove(i)"
+                  >
+                    {{ role.role_name }}|{{ role.role_id }}
+                    <button matChipRemove>
+                      <mat-icon>cancel</mat-icon>
+                    </button>
+                  </mat-chip>
+                  <input
+                    placeholder="New Role Group..."
+                    #roleGrpInput
+                    [formControl]="roleGroupCtrl"
+                    [matAutocomplete]="auto"
+                    [matChipInputFor]="chipList"
+                    [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                  />
+                </mat-chip-list>
+                <mat-autocomplete
+                  #auto="matAutocomplete"
+                  (optionSelected)="selected($event)"
+                >
+                  <mat-option
+                    *ngFor="let role of filteredRoleGroups | async"
+                    [value]="role"
+                  >
+                    {{ role.role_name }}
+                  </mat-option>
+                </mat-autocomplete>
+              </mat-form-field>
+        </div>
+        <div class="row">
+            <div class="row">
+                <button class="update-btn" (click) = "updateRoleGroups()">Update Role Groups</button>
+            </div>
+        </div>
+       
+     </mat-tab>
+
+    <!-- <mat-tab label="Filter config">
+        <div class="row">
+            <button class="update-btn" (click) = "updateFilterConfig()">Update Filter Config</button>
+        </div> 
+    </mat-tab> -->
+  
+  </mat-tab-group>

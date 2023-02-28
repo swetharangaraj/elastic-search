@@ -40,17 +40,14 @@ export class ExecTargetMysqlComponent implements OnInit {
   /***
    * custom query
    */
-  isCustomQuery: boolean = false;
-  selectStatement!: string;
-  fromTable!: string;
-  joinStatement!: string;
-  optionalWhere!: string;
-  mandatoryWhere: string = `(UNIX_TIMESTAMP(changed_on) > :sql_last_value AND changed_on < NOW() AND is_active = 1) order by changed_on ASC`;
+  isCustomQuery: boolean = true;
+
   testableQuery!: string;
   finalQuery!: string;
   testableDatabases: any = [];
   queryTestResults: any = [];
-
+  testCustomQuery: string = '';
+  actualCustomQuery: string = '';
   readonly separatorKeysCodes = [ENTER, COMMA] as const;
   constructor(
     private _es: EsManagementService,
@@ -365,23 +362,8 @@ export class ExecTargetMysqlComponent implements OnInit {
 
   /***custom query methods */
   generateQuery = () => {
-    if (this.selectStatement && this.fromTable) {
-      this.testableQuery = `${this.selectStatement.replace(
-        '\n',
-        ' '
-      )} AS unix_ts_in_secs FROM ${this.fromTable} ${
-        this.joinStatement ? this.joinStatement.replace('\n', ' ') : ''
-      } ${this.optionalWhere ? 'WHERE ' + this.optionalWhere : ''} LIMIT 1`;
-
-      this.finalQuery = `${this.selectStatement.replace(
-        '\n',
-        ' '
-      )} AS unix_ts_in_secs FROM ${this.fromTable} ${
-        this.joinStatement ? this.joinStatement.replace('\n', ' ') : ''
-      } WHERE ${this.optionalWhere ? this.optionalWhere + ' AND' : ''}  ${
-        this.mandatoryWhere
-      }`;
-    }
+    this.testableQuery = this.testCustomQuery;
+    this.finalQuery = this.actualCustomQuery;
 
     this.testableQuery = this.testableQuery.replaceAll('\n', ' ');
     this.finalQuery = this.finalQuery.replaceAll('\n', ' ');

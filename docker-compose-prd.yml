@@ -32,10 +32,13 @@ services:
         target: /usr/share/logstash/jdbc-connector
         read_only: true
       - type: bind
-        source: ./logstash-config/logstash-prd.yml
+        source: ./logstash-config/logstash.yml
         target: /usr/share/logstash/config/logstash.yml
         read_only: true
     restart: on-failure
+    logging:
+      options:
+        max-size: 10m    
 
   search-mgmt-service:
     build:

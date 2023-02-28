@@ -1,4 +1,4 @@
-<div class="row">
+<!-- <div class="row">
   <div class="col-12">
     <h4>Select the Target Databases to which you want to sync Data</h4>
   </div>
@@ -316,7 +316,6 @@
                         </td>
                       </tr>
 
-                      <!-- More people... -->
                     </tbody>
                   </table>
                 </div>
@@ -344,7 +343,7 @@
       </div>
     </div>
   </div>
-</div>
+</div> -->
 
 <div *ngIf="selectedTargetDatabaseType == 'other' && !isCustomQuery">
   <div class="row mt-2">
@@ -459,7 +458,7 @@
 <div *ngIf="isCustomQuery">
   <div class="row">
     <div class="col-12">
-      <div class="row">Enter the query</div>
+      <div class="row">Enter the Test query</div>
       <div class="row">
         <div class="col-12">
           <textarea
@@ -468,66 +467,21 @@
             rows="4"
             cols="50"
             style="border: solid 1px"
-            [(ngModel)]="selectStatement"
+            [(ngModel)]="testCustomQuery"
           >
           </textarea>
         </div>
       </div>
-      <div class="row">AS unix_ts_in_secs FROM</div>
+      <div class="row">Enter the Actual query</div>
       <div class="row">
         <div class="col-12">
           <textarea
-            id="table_from"
-            name="table_from"
-            rows="1"
-            cols="50"
-            style="border: solid 1px"
-            [(ngModel)]="fromTable"
-          >
-        table name
-        </textarea
-          >
-        </div>
-      </div>
-      <div class="row">(Add Joins below)</div>
-      <div class="row">
-        <div class="col-12">
-          <textarea
-            id="table_from"
-            name="table_from"
-            rows="5"
-            cols="50"
-            style="border: solid 1px"
-            [(ngModel)]="joinStatement"
-          >
-          </textarea>
-        </div>
-      </div>
-
-      <div class="row">WHERE</div>
-      <div class="row">
-        <div class="col-12">
-          <textarea
-            id="where-cond"
-            name="where-cond"
+            id="query-main"
+            name="query-main"
             rows="4"
             cols="50"
             style="border: solid 1px"
-            [(ngModel)]="optionalWhere"
-          >
-          </textarea>
-        </div>
-      </div>
-      <div class="row" *ngIf="optionalWhere">AND</div>
-      <div class="row">
-        <div class="col-12">
-          <textarea
-            id="where-cond-mand"
-            name="where-cond-mand"
-            rows="4"
-            cols="50"
-            style="border: solid 1px"
-            [(ngModel)]="mandatoryWhere"
+            [(ngModel)]="actualCustomQuery"
           >
           </textarea>
         </div>

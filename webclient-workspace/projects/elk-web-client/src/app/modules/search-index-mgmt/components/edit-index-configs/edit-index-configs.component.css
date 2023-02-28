@@ -1,0 +1,12 @@
+
+
+.update-btn{
+    height: 38px;
+    background: gray;
+    color: white;
+}
+
+textarea{
+    height: 32rem;
+    width: 48rem;
+}

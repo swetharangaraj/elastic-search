@@ -1,0 +1,9 @@
+apiVersion: ambassador/v1
+kind: Mapping
+name: search_client_mapping
+prefix: /api/search
+rewrite: /api/search
+service: search-mgmt-service:6600
+timeout_ms: 60000
+idle_timeout_ms: 120000
+connect_timeout_ms: 60000

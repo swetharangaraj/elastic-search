@@ -157,4 +157,46 @@ export class EsManagementService {
       query_string: queryString,
     });
   }
+
+  SyncBasePipelineWithTenants = (selected_pipelines:any, tenants:any) =>{
+    return this.$http.post('/api/elastic/v1/SyncBasePipelineWithTenants', {
+      selected_pipelines: selected_pipelines,
+      tenants: tenants
+    });
+  }
+ 
+  getActiveTenants = () =>{
+    return this.$http.post("/api/sqlSync/v1/getActiveTenants",{})
+  }
+
+
+  syncIndexUiMap = (source_index:any, target_index:any) =>{
+    return this.$http.post("/api/elastic/v1/syncIndexUiMap",{
+      source_index:source_index,
+      target_index:target_index
+    })
+  }
+
+
+  getIndexConfigs = (index:string) =>{
+    return this.$http.post("/api/elastic/v1/getIndexConfigs",{
+      index:index
+    })
+  }
+
+  updateUiMap = (id:any,index:any,fields:any) =>{
+    return this.$http.post("/api/elastic/v1/updateUiMapping",{
+      index:index,
+      id:id,
+      fields:fields
+    })
+  }
+
+
+  updateIndexRole = (roles:any,index_id:any) =>{
+    return this.$http.post("/api/elastic/v1/updateIndexRole",{
+      roles:roles,
+      index_id:index_id,
+    })
+  }
 }
