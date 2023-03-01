@@ -96,7 +96,8 @@ export class EsManagementService {
     fieldsToBeIndexed: any,
     selectedRoleGroups: any,
     routerUrl: string,
-    executed_on: string
+    executed_on: string,
+    authFilterApi:string
   ) {
     return this.$http.post('/api/mongoSync/v1/createMongoPipelines', {
       colToBeIndexed: colToBeIndexed,
@@ -104,6 +105,7 @@ export class EsManagementService {
       selectedRoleGroups: selectedRoleGroups,
       route_url: routerUrl,
       executed_on: executed_on,
+      authFilterApi:authFilterApi
     });
   }
 

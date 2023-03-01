@@ -39,6 +39,7 @@ export class ExecTargetMongoComponent implements OnInit {
   @ViewChild('roleGrpInput') roleGrpInput!: ElementRef<HTMLInputElement>;
   filteredRoleGroups!: Observable<any[]>;
   routeUrl = new FormControl();
+  authFilterApi = new FormControl();
 
   /**Other database migration mode declarations */
   otherDbNameFormCtrl = new FormControl();
@@ -340,7 +341,8 @@ export class ExecTargetMongoComponent implements OnInit {
             this.fieldsToBeIndexed,
             this.selectedRoleGroups,
             this.routeUrl.value,
-            'tad'
+            'tad',
+            this.authFilterApi.value
           )
           .subscribe({
             next: (res) => {
