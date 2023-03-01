@@ -295,7 +295,8 @@ export class ExecTargetMongoComponent implements OnInit {
                     this.fieldsToBeIndexed,
                     this.selectedRoleGroups,
                     this.routeUrl.value,
-                    'other_db'
+                    'other_db',
+                    this.authFilterApi.value
                   )
                   .subscribe({
                     next: (res) => {

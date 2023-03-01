@@ -137,6 +137,8 @@ module.exports = {
       let selectedRoleGroups = req.body.selectedRoleGroups;
       let executed_on = req.body.executed_on;
       let route_url = req.body.route_url;
+      let auth_filter_api = req.body.authFilterApi;
+
       let index_doc = {
         index_name: col_to_be_indexed.index_name,
         ingestion_mode: "database_sync",
@@ -149,6 +151,7 @@ module.exports = {
         app_name: col_to_be_indexed.alias,
         fetch_method: "collection_fetch",
         route_url: route_url,
+        auth_filter_api: auth_filter_api,
         accessible_roleGroups: selectedRoleGroups,
       };
 
