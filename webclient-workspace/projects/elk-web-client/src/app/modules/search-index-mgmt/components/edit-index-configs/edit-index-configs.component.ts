@@ -99,7 +99,7 @@ indexConfig:any = {}
   updateUiMapping = () =>{
     console.log(JSON.parse(this.indexUiMapping))
 
-    this._es.updateUiMap(this.indexConfig.index_ui_mapping._id, this.data.index_name, JSON.parse(this.indexUiMapping)).subscribe({
+    this._es.updateUiMap(this.data.index_name, JSON.parse(this.indexUiMapping)).subscribe({
       next:(res:any) =>{
         console.log(res);
         window.location.reload();

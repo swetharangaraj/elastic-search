@@ -321,11 +321,10 @@ module.exports = {
 
   updateUiMapping: async (req, res) => {
     try {
-      let id = req.body.id;
       let index = req.body.index;
       let fields = req.body.fields
 
-      const query = { _id: ObjectId(id) };
+      const query = { index_name: index };
       const update = { $set: { index_name: index, fields: fields } };
       const options = { upsert: true };
       let update_result = await mongo.client.db('elastic_management').collection('t_index_ui_field_mapping').updateOne(query, update, options);
