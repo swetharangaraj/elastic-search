@@ -29,6 +29,9 @@ module.exports = {
       let result = await pool(
         `SELECT role_id from ${tad}.m_user_role WHERE oid = '${oid}'`
       );
+
+      console.log(result)
+
       if (result.length > 0) {
         let role_id = result[0].role_id;
         let allowed_indices = await mongo.client
