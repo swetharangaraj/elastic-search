@@ -299,9 +299,12 @@ module.exports = {
         index: index
       }).toArray();
 
+      let index_result = await mongo.client.db('elastic_management').collection('t_indices').findOne({ index_name: index })
+      let highlight_fields = index_result.highlight_fields;
       let config = {
         index_ui_mapping: index_ui_mapping,
-        t_filter_response_types: t_filter_response_types
+        t_filter_response_types: t_filter_response_types,
+        highlight_fields: highlight_fields
       }
 
       res.send({
@@ -361,6 +364,35 @@ module.exports = {
       res.send({
         err: false,
         message: "role update successfull",
+        data: update_result
+      });
+
+    }
+    catch (err) {
+      console.log(err);
+      logger.error(err);
+      res.status(500).send({
+        err: true,
+        message: err,
+      });
+    }
+  },
+
+  updateHighLightedFields: async (req, res) => {
+    try {
+
+      let index = req.body.index;
+      let highlight_fields = req.body.highlight_fields;
+
+      let update_result = await mongo.client.db('elastic_management').collection('t_indices').updateOne(
+        { index_name: index },
+        {
+          $set: { highlight_fields: highlight_fields }
+        }
+      )
+      res.send({
+        err: false,
+        message: "highlights update successfull",
         data: update_result
       });
 

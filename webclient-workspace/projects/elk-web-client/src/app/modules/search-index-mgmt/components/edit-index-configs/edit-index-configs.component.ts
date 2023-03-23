@@ -17,7 +17,7 @@ export class EditIndexConfigsComponent implements OnInit {
 
   filterConfig!:any;
   indexUiMapping!:any;
-
+  highlightFields!:any;
   roleGroupCtrl = new FormControl();
   selectedRoleGroups: any = [];
   allRoleGroups: any = [];
@@ -56,6 +56,8 @@ indexConfig:any = {}
   async ngOnInit(): Promise<void> {
     this.indexConfig  = await this.getIndexConfig();
     this.indexUiMapping = JSON.stringify(this.indexConfig.index_ui_mapping?.fields, null, 2);
+    if(this.indexConfig.highlight_fields)
+    this.highlightFields = JSON.stringify(this.indexConfig.highlight_fields, null, 2)
     this.getRoleGroups();
     this.selectedRoleGroups = this.data.accessible_roleGroups
   }
@@ -118,6 +120,19 @@ indexConfig:any = {}
     this._es.updateIndexRole(this.selectedRoleGroups,this.data._id).subscribe({
       next:(res:any) =>{window.location.reload()},
       error:(err:any) =>{console.error(err)}
+    })
+  }
+
+
+  updateHighlightFields(){
+    this._es.updateHighLightedFields(this.data.index_name, JSON.parse(this.highlightFields)).subscribe({
+      next:(res:any) =>{
+        console.log(res);
+        window.location.reload();
+      },
+      error:(err:any) =>{
+        console.error(err);
+      }
     })
   }
 }

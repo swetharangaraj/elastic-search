@@ -51,10 +51,13 @@
        
      </mat-tab>
 
-    <!-- <mat-tab label="Filter config">
-        <div class="row">
-            <button class="update-btn" (click) = "updateFilterConfig()">Update Filter Config</button>
-        </div> 
-    </mat-tab> -->
+     <mat-tab label="Highlight Fields">
+      <div class="row">
+          <button class="update-btn" (click) = "updateHighlightFields()">Update Highlight fields</button>
+      </div>
+      <!-- <json-editor [options]='options' [data]='indexConfig.index_ui_mapping?.fields'></json-editor> -->
+      <textarea name="" id="" cols="30" rows="10" [(ngModel)]="highlightFields"></textarea>
+  </mat-tab>
+
   
   </mat-tab-group>

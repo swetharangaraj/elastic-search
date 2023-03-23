@@ -122,5 +122,17 @@ router.get("/v1/getIndexStats", elastic_service.getIndexStats);
  */
  router.post("/v1/updateIndexRole", elastic_service.updateIndexRole);
 
+
+ 
+ /**
+ * Route updateHighLightedFields
+ * @name post/api/elastic/v1/updateHighLightedFields
+ * @function
+ * @memberof module:routers/elastic~elasticRouter
+ * @inner
+ * @param {string} path - Express path
+ * @param {callback} middleware - Express middleware.
+ */
+ router.post("/v1/updateHighLightedFields", elastic_service.updateHighLightedFields);
  
 module.exports = router

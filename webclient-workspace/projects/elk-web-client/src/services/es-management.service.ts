@@ -200,4 +200,11 @@ export class EsManagementService {
       index_id:index_id,
     })
   }
+
+  updateHighLightedFields = (index:any,highlight_fields:any) =>{
+    return this.$http.post("/api/elastic/v1/updateHighLightedFields",{
+      index:index,
+      highlight_fields:highlight_fields,
+    })
+  }
 }
