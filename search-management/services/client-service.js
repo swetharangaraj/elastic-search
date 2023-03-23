@@ -63,6 +63,7 @@ module.exports = {
                 app_name: 1,
                 route_url: 1,
                 auth_filter_api: 1,
+                highlight_fields:1
               },
             },
           ])
